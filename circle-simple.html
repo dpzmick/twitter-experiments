@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>Google Maps JavaScript API v3 Example: Circle Simple</title>
+        <link href="default.css" rel="stylesheet">
+        <script src="json2.js"> </script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+        
+        <script>
+        
+        var data;
+        var points = {};
+        var fancyMap;
+
+        
+        function initialize(){
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', 'out.json', false);
+            xhr.send(null);
+
+            data = JSON.parse(xhr.responseText);
+
+            document.getElementById('lightbox').style.visibility = 'hidden'; 
+            
+            var mapOptions = {
+                zoom: 4,
+                center: new google.maps.LatLng(37.09024, -95.712891),
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            };
+            
+           var map =  new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+            for (var point in data) {
+                var options = {
+                    strokeColor: (data[point]["value"] < 0) ? '#FF0000' : '#0000FF',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: (data[point]["value"] < 0) ? '#FF0000' : '#0000FF',
+                    fillOpacity: 0.35,
+                    map: map,
+                    center: new google.maps.LatLng(data[point]["center"][0], data[point]["center"][1]),
+                    radius: 10000
+                };
+                new google.maps.Circle(options);
+            }
+        }
+
+        // MAIN ENTRY POINT
+        //$.getJSON("out.json", onDataLoad);
+        </script>
+    </head>
+
+    <body onload="initialize()">
+        <div id="map_canvas"></div>
+        <div id="lightbox"> <center> Data loading </center> </div>
+    </body>
+</html>

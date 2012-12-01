@@ -39,10 +39,10 @@ for key in countrySentiment.keys():
 
 print countrySentiment
 
-delimit = '\t'
+delimit = ','
 f = open('out.csv', 'w')
 f.write('country_name' + delimit + 'value\n')
 for key in countrySentiment.keys():
-    string = '%s%s%s\n' % (key, delimit, countrySentiment[key])
+    string = '%s%s%s\n' % (key.replace(',', ' '), delimit, countrySentiment[key])
     f.write(string)
 f.close()
