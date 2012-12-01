@@ -9,7 +9,7 @@ db = conn.tweets
 collection = db.classified
 
 data = {}
-for tweet in collection.find().limit(1000):
+for tweet in collection.find().limit(5000):
     _id = str(tweet["_id"])
 
     value = 0
