@@ -21,18 +21,19 @@ testfeats = negfeats[negcutoff:] + posfeats[poscutoff:]
 print 'train on %d instances, test on %d instances' % (len(trainfeats), len(testfeats))
  
 classifier = NaiveBayesClassifier.train(trainfeats)
-print 'accuracy:', nltk.classify.util.accuracy(classifier, testfeats)
-classifier.show_most_informative_features()
+# print 'accuracy:', nltk.classify.util.accuracy(classifier, testfeats)
+# classifier.show_most_informative_features()
 
 # mine
-
+print "Running on database (finally)"
 from pymongo import Connection
 conn = Connection()
-db = conn.texas
-collection = db.posts
+db = conn.tweets
+old = db.cleaned
+new = db.classified
 
-for post in collection.find():
-    print classifier.classify(word_feats(post['text']))
-    print ":"
-    print post['text']
-    print "------"
+for post in old.find():
+    post['sentiment'] = classifier.classify(word_feats(post['cleanedText']))
+    new.insert(post)
+    #TODO
+    # old.remove(post)

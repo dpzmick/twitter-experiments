@@ -4,25 +4,34 @@ import json
 import threading
 import pymongo
 from pymongo import Connection
+import urllib
 
 # I connect to the streaming api and fetch tweets. I call a callback when the
 # tweets are fetched.
-class Client(threading.Thread):
-    # words should be in format "track=#Texas"
-    def __init__(self, url, words, callback, username, passwd):
+class Client:
+    # track - comma separated list of keywords to track
+    # locations - set of bounding boxes to track.
+    def __init__(self, url, callback, username, passwd, track="", locations=""):
         self.buff = ""
         self.conn = pycurl.Curl()
         self.url = url
-        self.words = words
+        
+        post_dict = {}
+        if track != '':
+            post_dict["track"] = track
+        if locations != '':
+            post_dict["locations"] = locations
+        self.post = urllib.urlencode(post_dict)
+
         self.callback = callback
         self.username = username
         self.passwd = passwd
-        threading.Thread.__init__(self)
+        #threading.Thread.__init__(self)
         
 
     def run(self):
         self.conn.setopt(pycurl.POST, 1)
-        self.conn.setopt(pycurl.POSTFIELDS, self.words)
+        self.conn.setopt(pycurl.POSTFIELDS, self.post)
         self.conn.setopt(pycurl.HTTPHEADER, ["Connection: keep-alive", "Keep-Alive: 3000"])
         self.conn.setopt(pycurl.USERPWD, "%s:%s" % (self.username, self.passwd))
         self.conn.setopt(pycurl.URL, self.url)
@@ -38,11 +47,12 @@ class Client(threading.Thread):
             self.callback(tweet)
 
 def print_tweet(tweet):
-    print tweet['text']
+    if tweet.get('text', -1) == -1:
+        print tweet
 
 def store_in_mongo(tweet):
     try:
-        db.unclassified.insert(tweet)
+        db.raw.insert(tweet)
         print_tweet(tweet)
     except:
         print ""
@@ -52,12 +62,12 @@ def store_in_mongo(tweet):
 
 
 STREAM_URL = "https://stream.twitter.com/1/statuses/filter.json"
-WORDS = "track=yolo"
 USER = "dpzmick"
 PASS = getpass.getpass()
 
 mongoConn = Connection()
 db = mongoConn.tweets
 
-c = Client(STREAM_URL, WORDS, store_in_mongo, USER, PASS)
-c.start()
+# gets any geotagged tweet
+c = Client(STREAM_URL, store_in_mongo, USER, PASS, '', '-180,-90,180,90') 
+c.run()
