@@ -15,6 +15,39 @@
         var fancyMap;
 
         
+        function heatmap() {
+            /* Data points defined as an array of LatLng objects */
+            var heatmapData = [
+                new google.maps.LatLng(37.782, -122.447),
+                new google.maps.LatLng(37.782, -122.445),
+                new google.maps.LatLng(37.782, -122.443),
+                new google.maps.LatLng(37.782, -122.441),
+                new google.maps.LatLng(37.782, -122.439),
+                new google.maps.LatLng(37.782, -122.437),
+                new google.maps.LatLng(37.782, -122.435),
+                new google.maps.LatLng(37.785, -122.447),
+                new google.maps.LatLng(37.785, -122.445),
+                new google.maps.LatLng(37.785, -122.443),
+                new google.maps.LatLng(37.785, -122.441),
+                new google.maps.LatLng(37.785, -122.439),
+                new google.maps.LatLng(37.785, -122.437),
+                new google.maps.LatLng(37.785, -122.435)
+            ];
+
+            var sanFrancisco = new google.maps.LatLng(37.774546, -122.433523);
+
+            map = new google.maps.Map(document.getElementById('map_canvas'), {
+                center: sanFrancisco,
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.SATELLITE
+            });
+
+            var heatmap = new google.maps.visualization.HeatmapLayer({
+                data: heatmapData
+            });
+            heatmap.setMap(map);
+        }
+
         function initialize(){
             var xhr = new XMLHttpRequest();
 
@@ -23,7 +56,8 @@
 
             data = JSON.parse(xhr.responseText);
 
-            
+            // Saving time upfront, have a crazy theory this makes google's side
+            // faster
             var newData = {};
             for (var point in data) {
                 newData[point] = {};
@@ -42,16 +76,19 @@
 
             for (var point in data) {
                 var options = {
+                    position: newData[point]["coord"],
+                    map: map,
+                    icon: {
+                    path: google.maps.SymbolPath.CIRCLE,                    
                     strokeColor: newData[point]["color"],
                     strokeOpacity: 0.8,
-                    strokeWeight: 2,
+                    strokeWeight: 0,
                     fillColor: newData[point]["color"],
-                    fillOpacity: 0.35,
-                    map: map,
-                    center: newData[point]["coord"],
-                    radius: 10000
+                    fillOpacity: 0.25,
+                    scale: 10
+                    }
                 };
-                new google.maps.Circle(options);
+                new google.maps.Marker(options);
             }
         }
 
@@ -60,7 +97,7 @@
         </script>
     </head>
 
-    <body onload="initialize()">
+    <body onload="heatmap()">
         <div id="map_canvas"></div>
     </body>
 </html>

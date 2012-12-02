@@ -1,6 +1,5 @@
-# generates a CSV file to feed into OpenHeatMap
-# negative = -1
-# positive = +1
+# dumps latest how many tweets to JSON.
+howMany = 2000
 
 print 'Loading Data'
 from pymongo import Connection
@@ -9,7 +8,7 @@ db = conn.tweets
 collection = db.classified
 
 data = {}
-for tweet in collection.find().limit(5000):
+for tweet in collection.find().sort([("created_at", 1)]).limit(howMany):
     _id = str(tweet["_id"])
 
     value = 0
