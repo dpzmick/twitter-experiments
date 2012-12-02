@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>Google Maps JavaScript API v3 Example: Circle Simple</title>
+        <link href="default.css" rel="stylesheet">
+        <script src="json2.js"> </script>
+        
+        <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4vc3OtTdvesmpHUxZrA0RSUFDGa_bbFY&libraries=visualization&sensor=false">
+        </script>
+
+        <script>
+        function getData() {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', '../dumps/out.json', false);
+            xhr.send(null);
+
+            return JSON.parse(xhr.responseText);
+        }
+
+        // Creates a density heatmap using the data
+        function heatmap() {
+            var data = getData();
+            var heatmapData = [];
+            for (var point in data) {
+                var latLng = new google.maps.LatLng(data[point]["center"][0], data[point]["center"][1]);
+                heatmapData.push(latLng);
+            }
+
+            map = new google.maps.Map(document.getElementById('map_canvas'), {
+                center: new google.maps.LatLng(20, -10),
+                zoom: 2,
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            });
+
+            var heatmap = new google.maps.visualization.HeatmapLayer({
+                radius: 10,
+                data: heatmapData
+            });
+            heatmap.setMap(map);
+        }
+        </script>
+    </head>
+
+    <body onload="heatmap()">
+        <div id="map_canvas"></div>
+    </body>
+</html>

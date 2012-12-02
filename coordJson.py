@@ -1,5 +1,5 @@
 # dumps latest how many tweets to JSON.
-howMany = 2000
+howMany = 1000
 
 print 'Loading Data'
 from pymongo import Connection
@@ -8,7 +8,14 @@ db = conn.tweets
 collection = db.classified
 
 data = {}
-for tweet in collection.find().sort([("created_at", 1)]).limit(howMany):
+
+queried = None
+if howMany == -1:
+    queried = collection.find()
+else:
+    queried = collection.find().sort([("created_at", 1)]).limit(howMany)
+
+for tweet in queried:
     _id = str(tweet["_id"])
 
     value = 0
@@ -25,6 +32,6 @@ for tweet in collection.find().sort([("created_at", 1)]).limit(howMany):
 
 print 'Writing File'
 import json
-f = open("out.json", 'w')
+f = open("dumps/out.json", 'w')
 f.write(json.dumps(data))
 f.close()
