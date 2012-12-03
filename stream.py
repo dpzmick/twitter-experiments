@@ -47,6 +47,7 @@ class Client:
             self.callback(tweet)
 
 def print_tweet(tweet):
+    # only print a tweet if it doesn't have text (isn't actually a tweet)
     if tweet.get('text', -1) == -1:
         print tweet
 
