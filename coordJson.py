@@ -1,5 +1,5 @@
 # dumps latest how many tweets to JSON.
-howMany = -1
+howMany = 1000
 
 print 'Loading Data'
 from pymongo import Connection
