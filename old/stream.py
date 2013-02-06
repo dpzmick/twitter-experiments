@@ -50,10 +50,12 @@ def print_tweet(tweet):
     # only print a tweet if it doesn't have text (isn't actually a tweet)
     if tweet.get('text', -1) == -1:
         print tweet
+    else:
+        print tweet['text']
 
 def store_in_mongo(tweet):
     try:
-        db.raw.insert(tweet)
+        #db.raw.insert(tweet)
         print_tweet(tweet)
     except:
         print ""
@@ -70,5 +72,5 @@ mongoConn = Connection()
 db = mongoConn.tweets
 
 # gets any geotagged tweet
-c = Client(STREAM_URL, store_in_mongo, USER, PASS, '', '-180,-90,180,90') 
+c = Client(STREAM_URL, store_in_mongo, USER, PASS, 'lost dog', '') 
 c.run()

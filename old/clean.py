@@ -56,14 +56,17 @@ def cleanStopWords(textList):
 def isValidTweet(tweet):
     if tweet.get('text', -1) == -1:
         return False
+    if tweet.get('geo', -1) == -1 or tweet.get('geo', -1) == None:
+        print "no geo"
+        return False
     return True
 
 # entry point
 def connectAndClean():
     conn = Connection()
     db = conn.tweets
-    old = db.raw
-    new = db.cleaned
+    old = db.flu_raw
+    new = db.flu_cleaned
 
     for tweet in old.find():
         if isValidTweet(tweet):
@@ -77,8 +80,8 @@ def connectAndClean():
                 textList = cleanStopWords(textList)
                 newText = ' '.join(textList)
                 print newText
-            #tweet['cleanedText'] = newText
-            #new.insert(tweet)
+                tweet['cleanedText'] = newText
+                new.insert(tweet)
             # TODO
             #old.remove({"_id" : {"$oid" : tweet['_id']}}) # nope..
 

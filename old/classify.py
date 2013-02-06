@@ -29,8 +29,8 @@ print "Running on database (finally)"
 from pymongo import Connection
 conn = Connection()
 db = conn.tweets
-old = db.cleaned
-new = db.classified
+old = db.flu_cleaned
+new = db.flu_classified
 
 for post in old.find():
     post['sentiment'] = classifier.classify(word_feats(post['cleanedText']))
