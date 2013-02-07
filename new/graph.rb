@@ -85,43 +85,45 @@ def another_pass(h_old)
     end
     return h
 end
-# gets people I follow and the people they follow
-h = friend_graph_of_depth(1)
 
 ##
 ##
 ##
 ## UBIGRAPH Vis happens here.
+def vis(h)
+    require 'xmlrpc/client'
+    server = XMLRPC::Client.new2("http://127.0.0.1:20738/RPC2")
+    server.call("ubigraph.clear")
 
-require 'xmlrpc/client'
-server = XMLRPC::Client.new2("http://127.0.0.1:20738/RPC2")
-server.call("ubigraph.clear")
+    puts "Making roots"
+    h.each_pair do |id, ids|
+        server.call("ubigraph.new_vertex_w_id", id)
+    end
+    
+    server.call("ubigraph.set_vertex_attribute", MY_ID, "size", "4")
+    server.call("ubigraph.set_vertex_attribute", MY_ID, "color", "#00FF00")
 
-puts "Making roots"
-h.each_pair do |id, ids|
-    server.call("ubigraph.new_vertex_w_id", id)
+    puts "Making connections"
+
+    puts h.keys
+    h[MY_ID].each do |id|
+        server.call("ubigraph.new_vertex_w_id", id)
+        server.call("ubigraph.new_edge", MY_ID, id)
+    end
+
+    # only using some accounts (jane and someone other one selected at random)
+    # because of speed
+
+    h[39011359].each do |id|
+        server.call("ubigraph.new_vertex_w_id", id)
+        server.call("ubigraph.new_edge", 39011359, id)
+    end
+
+    h[19909160].each do |id|
+        server.call("ubigraph.new_vertex_w_id", id)
+        server.call("ubigraph.new_edge", 19909160, id)
+    end
 end
 
-server.call("ubigraph.set_vertex_attribute", MY_ID, "size", "4")
-server.call("ubigraph.set_vertex_attribute", MY_ID, "color", "#00FF00")
-
-puts "Making connections"
-
-puts h.keys
-h[MY_ID].each do |id|
-    server.call("ubigraph.new_vertex_w_id", id)
-    server.call("ubigraph.new_edge", MY_ID, id)
-end
-
-# only using some accounts (jane and someone other one selected at random)
-# because of speed
-
-h[39011359].each do |id|
-    server.call("ubigraph.new_vertex_w_id", id)
-    server.call("ubigraph.new_edge", 39011359, id)
-end
-
-h[19909160].each do |id|
-    server.call("ubigraph.new_vertex_w_id", id)
-    server.call("ubigraph.new_edge", 19909160, id)
-end
+# gets people I follow and the people they follow
+h = friend_graph_of_depth(2)
