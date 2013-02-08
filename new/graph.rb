@@ -10,62 +10,78 @@ Twitter.configure do |config|
 end
 #MY_ID = Twitter.user['id']
 MY_ID = 14080233
+$COUNTER = 0
 
-def load_friends(id=MY_ID)
+def load_followers(id=MY_ID)
     # try and load from cache, if cache outdated or doesn't exist, reload data.
-    friends = []
-    t = Time.now
-    if File.exists?("cache/friends_#{id}")
-        puts "Loading friends from cache"
-        friends = load_cache_friends(id)
+    followers = []
+    if File.exists?("cache/followers_#{id}")
+        puts "Loading followers from cache"
+        followers = load_cache_followers(id)
     else
-        puts "Loading friends from api"
-        friends = load_api_friends(id)
-        cache_friends(friends, id)
+        puts "Loading followers from api"
+        followers = load_api_followers(id)
+        cache_friends(followers, id)
     end
     return friends
 end
-def cache_friends(friends, id)
-    f = File.new("cache/friends_#{id}", 'w+')
-    if friends.nil?
+def cache_followers(followers, id)
+    f = File.new("cache/followers_#{id}", 'w+')
+    if followers.nil?
         return
     end
-    friends.each do |friend|
-        f.puts(friend)
+    followers.each do |follower|
+        f.puts(follower)
     end
     f.close
 end
-def load_cache_friends(id)
-    friends = []
-    file = File.open("cache/friends_#{id}")
+def load_cache_followers(id)
+    followers = []
+    file = File.open("cache/followers_#{id}")
     file.each do |line|
-        friends << Integer(line)
+        followers << Integer(line)
     end
-    return friends
+    return followers
 end
-def load_api_friends(id)
-    friends = []
-    cursor = nil
+def load_api_followers(id)
+    puts "\t sleeping to obey rate limit (#{$COUNTER})"
+    sleep 180
+    followers = []
     begin
-        Twitter.friend_ids(id).each do |friend|
-            friends << friend
+        Twitter.followers_ids(id).each do |followers|
+            followers << follower
         end
     rescue Twitter::Error::Unauthorized
         puts "CAN'T GET THIS USERS INFORMATION"
         return nil
+    rescue Twitter::Error::TooManyRequests => error
+        puts "\t Rate limit exceeded, sleeping"
+        sleep error.rate_limit.reset_in
+        retry
     end
-    puts "\t sleeping to obey rate limit"
-    sleep 60
-    return friends
+    $COUNTER = $COUNTER + 1
+    return followers
 end
 
-def friend_graph_of_depth(depth)
+def follower_graph_of_depth(depth)
     h = {}
-    h[MY_ID] = load_friends
+    h[MY_ID] = load_followers
     depth.times do
         h = another_pass(h)
     end
     return h
+end
+
+def left(h_old, h_new)
+    left = 0
+    h_old.each_pair do |id, ids|
+        ids.each do |id1|
+            if h_new[id1].nil?
+                left = left + 1
+            end
+        end
+    end
+    return left
 end
 
 def another_pass(h_old)
@@ -73,8 +89,9 @@ def another_pass(h_old)
     h_old.each_key do |key|
         h[key] = h_old[key]
         h_old[key].each do |id|
+            puts "Have #{left(h_old, h)} left"
             if h_old[id].nil?
-                f = load_friends(id)
+                f = load_followers(id)
                 if not f.nil?
                     h[id] = f
                 end
@@ -119,11 +136,24 @@ def vis(h)
         server.call("ubigraph.new_edge", 39011359, id)
     end
 
-    h[19909160].each do |id|
-        server.call("ubigraph.new_vertex_w_id", id)
-        server.call("ubigraph.new_edge", 19909160, id)
+    #h[19909160].each do |id|
+    #    server.call("ubigraph.new_vertex_w_id", id)
+    #    server.call("ubigraph.new_edge", 19909160, id)
+    #end
+end
+
+def csv(h)
+    f = File.new('out.csv', 'w+')
+    h.each_pair do |id, ids|
+        ids.each do |id1|
+            f.puts("#{id},#{id1}")
+        end
     end
+
+    f.close
 end
 
 # gets people I follow and the people they follow
 h = friend_graph_of_depth(2)
+#csv(h)
+# vis(h)
