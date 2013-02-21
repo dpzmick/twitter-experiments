@@ -39,13 +39,22 @@ DEBUG = true
 
 def load_followers(id=MY_ID)
     # try and load from cache, if cache outdated or doesn't exist, reload data.
+    if File.exist?("in_progress/in_#{id}")
+        puts "SKIPPING #{id}"
+        return nil
+    end
+    f = File.new("in_progress/in_#{id}", "w+")
+    f.close
+
     followers = []
     if File.exists?("cache/followers_#{id}")
         followers = load_cache_followers(id)
     else
-        #followers = load_api_followers(id)
-        #cache_followers(followers, id)
+        followers = load_api_followers(id)
+        cache_followers(followers, id)
     end
+
+    File.delete("in_progress/in_#{id}")
 
     return followers
 end
@@ -68,7 +77,6 @@ def load_cache_followers(id)
     end
     return followers
 end
-
 def load_api_followers(id)
     dputs "Loading followers for #{id} from API @ #{Time.now}"
     followers = []
@@ -101,6 +109,8 @@ def follower_graph_of_depth(depth)
     return h
 end
 
+# this is gross
+# TODO: fix this.
 def another_pass(h_old)
     h = {}
     h_old.each_key do |key|
@@ -131,5 +141,5 @@ def csv(h)
     f.close
 end
 
-h = follower_graph_of_depth(2)
+h = follower_graph_of_depth(1)
 csv(h)

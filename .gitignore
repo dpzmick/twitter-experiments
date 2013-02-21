@@ -1,6 +1,5 @@
 .DS_Store
 *.swp
 new/config.rb
-new/cache/*
-new/f_cache/*
-*.csv
+graph/cache/*
+graph/friends/f_cache/*
