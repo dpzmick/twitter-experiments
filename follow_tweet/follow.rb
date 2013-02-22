@@ -27,6 +27,7 @@ ladygaga_id = 14230524
 barackObama_id = 813286
 dpzmick_id = 14080233
 notzmick_id = 1155825132
+cnn_breaking_news_id = 428333
 
 id = notzmick_id
 tracked_tweet = nil
