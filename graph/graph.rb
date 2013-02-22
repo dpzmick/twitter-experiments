@@ -3,9 +3,9 @@ require 'twitter'
 
 
 Twitter.configure do |config|
-  config.consumer_key = Conf::CONSUMER_KEY
-  config.consumer_secret = Conf::CONSUMER_SECRET
-  config.oauth_token = Conf::OAUTH_TOKEN
+  config.consumer_key       = Conf::CONSUMER_KEY
+  config.consumer_secret    = Conf::CONSUMER_SECRET
+  config.oauth_token        = Conf::OAUTH_TOKEN
   config.oauth_token_secret = Conf::OAUTH_TOKEN_SECRET
 end
 
@@ -141,5 +141,5 @@ def csv(h)
     f.close
 end
 
-h = follower_graph_of_depth(1)
+h = follower_graph_of_depth(2)
 csv(h)
