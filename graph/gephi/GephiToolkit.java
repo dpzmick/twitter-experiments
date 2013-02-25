@@ -45,7 +45,7 @@ public class GephiToolkit {
         Container container;
         try {
             System.out.println("Loading file");
-            File file = new File("/Users/dz0004455/programming/ncsa/graph/out.csv");
+            File file = new File("/Users/dz0004455/programming/ncsa/graph/csv/zero.csv");
             System.out.println("File loaded, Importing");
             container = importController.importFile(file);
             container.getLoader().setEdgeDefault(EdgeDefault.DIRECTED);

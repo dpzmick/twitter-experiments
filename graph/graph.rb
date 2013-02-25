@@ -34,7 +34,8 @@ def pretty_sleep(label, time)
 end
 
 #MY_ID = Twitter.user['id']
-MY_ID = 14080233
+# MY_ID = 14080233
+MY_ID = 813286 # obama
 DEBUG = true
 
 def load_followers(id=MY_ID)
@@ -77,16 +78,50 @@ def load_cache_followers(id)
     end
     return followers
 end
+def hasIncomplete(id)
+    return File.exist?("incomplete/#{id}")
+end
+def loadIncomplete(id)
+    f = File.open("incomplete/#{id}")
+    # all lines are follower ids, until line "cursor:<cursor value>" (last line)
+    followers = []
+    cursor = "-1"
+    f.each do |line|
+        begin
+            followers << Integer(line)
+        rescue ArgumentError
+            cursor = line.split(':')[1]
+        end
+    end
+    f.close()
+    return {:followers => followers, :cursor => cursor}
+end
+def storeIncomplete(followers, cursor, id)
+    f = File.open("incomplete/#{id}", 'w+')
+    followers.each do |follower|
+        f.puts(follower)
+    end
+    f.puts("cursor:#{cursor}")
+    f.close()
+end
 def load_api_followers(id)
     dputs "Loading followers for #{id} from API @ #{Time.now}"
     followers = []
     begin
-        cursor = "-1"
+        if hasIncomplete(id)
+            data = loadIncomplete(id)
+            followers += data[:followers]
+            cursor = data[:cursor]
+        else
+            cursor = "-1"
+        end
         while cursor != 0 do
             dputs "\tMaking request to API"
             fs = Twitter.follower_ids(id, {:cursor => cursor})
             cursor = fs.next_cursor
             followers += fs.ids
+            dputs "\tStoring in temp"
+            storeIncomplete(followers, cursor, id)
             pretty_sleep("\tAvoiding rate limit: ", 60)
         end
     rescue Twitter::Error::Unauthorized
