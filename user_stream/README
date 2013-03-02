@@ -1,0 +1,7 @@
+This experiment will track all activity around a specific user.
+Retweets, mentions, and original tweets will be included.
+
+This can data can later be used to follow a single tweet around. This is
+preferred to waiting until a users posts a tweet, then pulling information, as
+it allows for data collection at once. I can track multiple tweets and their
+retweets instead of single tweets.
