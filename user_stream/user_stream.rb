@@ -1,4 +1,6 @@
 # store all tweets relating to a user in a collection in mongo
+# Does nothing more, nothing less.
+
 require './config'
 require 'mongo'
 require 'tweetstream'
@@ -21,11 +23,6 @@ def dputs(val)
         puts val
     end
 end
-def save_tweet(tweet, directory)
-    cache = File.open("#{directory}/#{tweet.id}", 'w')
-    cache.write(Marshal.dump(tweet))
-    cache.close
-end
 
 # a couple of ids
 ladygaga_id = 14230524
@@ -35,7 +32,6 @@ notzmick_id = 1155825132
 cnn_breaking_news_id = 428333
 
 id = cnn_breaking_news_id
-
 storage = db.collection(id.to_s)
 
 TweetStream::Client.new.follow(id) do |status|
