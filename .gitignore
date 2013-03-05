@@ -2,3 +2,5 @@
 *.swp
 */config.rb
 data/*
+history/*
+*.pyc

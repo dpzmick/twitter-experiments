@@ -1,70 +1,76 @@
 # Get a single tweet by user out of database, find retweets, make a picture.
 
+# local
+from db import *
+# not local
 import matplotlib.pyplot as plt
-import pymongo
+import matplotlib.mlab as mlab
 import math
 import dateutil.parser
-import difflib
+from colorama import init, Fore
+init()
 
-userid = 428333
-conn = pymongo.Connection('66.228.60.19')
-db = conn['tweets']
-tweets = db[str(userid)]
+# IO
+def pickUser(id_list_name = '../id_list'):
+    print Fore.BLUE + "Please pick a user to look at (ids loaded from %s)" % id_list_name
+    ids = []
+    id_list = open(id_list_name)
+    for i, _id in enumerate(id_list):
+        parts = _id.strip().split(':')
+        ids.append(int(parts[1]))
+        print "%s%d: %s%s" % (Fore.RED, i, Fore.WHITE, parts[0],)
+    id_list.close()
+    return ids[int(raw_input(Fore.RED + "> " + Fore.RESET))]
 
-# TODO need a better way of looking at specific tweets.
-possible_tweets = []
-count = 0
-print "Options:"
-for tweet in tweets.find({'user.id' : userid}):
-    print str(count) + ": " + tweet['text']
-    count += 1
-    possible_tweets.append(tweet)
+def pickTweet(tweets, userID):
+    user_tweets = getUsersTweets(tweets, userID)
+    print Fore.BLUE + "Options for Tweet to visualize:"
+    for i, tweet in enumerate(user_tweets):
+        print "%s%d: %s%s" % (Fore.RED, i, Fore.WHITE, tweet['text'])
+    return user_tweets[int(raw_input(Fore.RED + "> " + Fore.RESET))]
 
-print 
-print "Please Select a tweet to look at:"
-selection = int(raw_input(">"))
-origin_tweet = possible_tweets[selection]
+# Pictures
+def simpleBarChart(tweet, retweets):
+    print Fore.BLUE + "Now making a nice picture" + Fore.RESET
+    times = []
+    for retweet in retweets:
+        times.append(dateutil.parser.parse(retweet['created_at']))
 
-print "Using Tweet: " + origin_tweet['text']
+    # setup bins for bar graph.
+    # range: time of first tweet -> time of last tweet
+    first = min(times)
+    last = max(times)
+    print Fore.BLUE + "First: " + Fore.RED + str(first) + Fore.RESET
+    print Fore.BLUE + "Last: " + Fore.RED + str(last) + Fore.RESET
 
-# find retweets
-# note: retweet count in stored tweet is not accurate
-# tweet was stored before any retweets could have been made
-# TODO evaluate if there is a better way to do this.
-print "Getting retweets"
+    # Will look at retweets per every <interval> seconds
+    print Fore.BLUE + "Interval Size? (in seconds)" + Fore.RESET
+    interval = int(raw_input(Fore.RED + "> " + Fore.RESET))
+    print "%sUsing %s%d%s second intervals%s" % (Fore.BLUE, Fore.RED, interval,
+            Fore.BLUE, Fore.RESET)
 
-retweets = []
-# misses some
-for tweet in tweets.find({'retweeted_status.text' : origin_tweet['text']}):
-    retweets.append(tweet)
+    intervals = {}
+    for time in times:
+        elapsed_intervals = math.floor((time - first).total_seconds() / interval)
+        intervals[elapsed_intervals] = intervals.get(elapsed_intervals, 0) + 1
 
-# slow, and still doesn't report same amount as twitter's website.
-#for tweet in tweets.find():
-#    if difflib.SequenceMatcher(None, tweet['text'],
-#            origin_tweet['text']).ratio() > 0.6:
-#        retweets.append(tweet)
+    plt.title(tweet['text'] + '\n' + tweet['user']['screen_name'])
+    plt.ylabel('Retweets')
+    plt.xlabel('%d second intervals after initial tweet' % interval)
+    plt.bar(intervals.keys(), intervals.values())
+    plt.show()
 
-print "Found %d" % len(retweets)
+if __name__ == "__main__":
+    userID = pickUser()
+    db = setUpDB()
+    tweets = getCollection(db, userID)
 
-print "Now making a nice picture"
-times = []
-for retweet in retweets:
-    times.append(dateutil.parser.parse(retweet['created_at']))
+    print Fore.BLUE + "Getting users tweets" + Fore.RESET
+    interesting_tweet = pickTweet(tweets, userID)
+    print Fore.BLUE + "Using Tweet: " + Fore.WHITE + interesting_tweet['text']
 
-# setup bins for bar graph.
-# range: time of first tweet -> time of last tweet
-first = min(times)
-last = max(times)
-
-# Will look at retweets per every <interval> seconds
-print "Interval Size? (in seconds)"
-interval = int(raw_input(">"))
-print "Using %d second intervals" % interval
-
-intervals = {}
-for time in times:
-    elapsed_intervals = math.floor((time - first).total_seconds() / interval)
-    intervals[elapsed_intervals] = intervals.get(elapsed_intervals, 0) + 1
-
-plt.bar(intervals.keys(), intervals.values())
-plt.show()
+    print Fore.BLUE + "Getting retweets (might take some time)" + Fore.RESET
+    retweets = findRetweetsQuicker(tweets, interesting_tweet)
+    print Fore.BLUE + "Found %s%d%s" % (Fore.RED, len(retweets), Fore.RESET)
+    
+    simpleBarChart(interesting_tweet, retweets)
