@@ -1,6 +1,0 @@
-The intent of this experiment is to grab the next tweet a user with some id
-tweets, then use the streaming API to find any retweets of that tweet.
-
-These will be stored, not sure exactly what to do with this yet.
-
-Updating to track retweets of all tweets, not just a single tweet.
