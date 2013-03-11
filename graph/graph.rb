@@ -90,19 +90,22 @@ def loadIncomplete(id)
         begin
             followers << Integer(line)
         rescue ArgumentError
-            cursor = line.split(':')[1]
+            cursor = Integer(line.split(':')[1])
         end
     end
     f.close()
     return {:followers => followers, :cursor => cursor}
 end
+# returns time taken to store file
 def storeIncomplete(followers, cursor, id)
+    start = Time.now
     f = File.open("incomplete/#{id}", 'w+')
     followers.each do |follower|
         f.puts(follower)
     end
     f.puts("cursor:#{cursor}")
     f.close()
+    return Time.now - start
 end
 def load_api_followers(id)
     dputs "Loading followers for #{id} from API @ #{Time.now}"
@@ -113,16 +116,18 @@ def load_api_followers(id)
             followers += data[:followers]
             cursor = data[:cursor]
         else
-            cursor = "-1"
+            cursor = -1
         end
         while cursor != 0 do
-            dputs "\tMaking request to API"
+            dputs "\tMaking request to API, cursor: #{cursor}, time: #{Time.now}"
             fs = Twitter.follower_ids(id, {:cursor => cursor})
             cursor = fs.next_cursor
             followers += fs.ids
+
             dputs "\tStoring in temp"
-            storeIncomplete(followers, cursor, id)
-            pretty_sleep("\tAvoiding rate limit: ", 60)
+            elapsed_time = storeIncomplete(followers, cursor, id)
+            pretty_sleep("\tAvoiding rate limit: ", Integer(60 - elapsed_time))
+
         end
     rescue Twitter::Error::Unauthorized
         puts "Failed to get user's information, skipping."
@@ -131,6 +136,8 @@ def load_api_followers(id)
         puts "\t Rate limit exceeded, sleeping for #{error.rate_limit.reset_in}"
         sleep error.rate_limit.reset_in
         retry
+    rescue Exception => error
+        puts "An error occured: #{error}"
     end
     return followers
 end
