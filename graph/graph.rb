@@ -99,6 +99,7 @@ end
 # returns time taken to store file
 def storeIncomplete(followers, cursor, id)
     start = Time.now
+    File.rename("incomplete/#{id}", "incomplete/#{id}-#{Time.now.to_i}")
     f = File.open("incomplete/#{id}", 'w+')
     followers.each do |follower|
         f.puts(follower)
