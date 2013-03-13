@@ -1,0 +1,14 @@
+Visualization:
+    - Percentage Graph (What percent of retweets come from direct followers)
+      Divided bar chart
+    - Chart showing "range" of tweet
+    - Chart showing volume of tweet
+    - Chart showing growth of followers
+
+Technical Issues:
+    - Faster way to find retweets
+        - Continue tuning queries
+    - Find better way to store tweets in mongo and cleanup old storage
+    - Move graph to db, build continuous graph tool
+        - Run a couple of queries on each user in list, update database entry.
+          Cycle through accounts and users
