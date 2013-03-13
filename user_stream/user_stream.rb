@@ -1,14 +1,23 @@
 # store all tweets relating to a user in a collection in mongo
 # Does nothing more, nothing less.
 
-require './config'
-require 'mongo'
+require './db'
 require 'tweetstream'
-
+require 'pp'
 include Mongo
-DEBUG = true
 
-db = Connection.new('66.228.60.19').db('tweets')
+def print_tracker(tracker)
+    longest = 
+        (tracker.keys.max { |a, b| a.to_s.length <=> b.to_s.length }).to_s.length
+    puts Time.now
+    tracker.each do |id, count|
+        printf("%-#{longest + 2}d %d\n", id, count)
+    end
+    puts 
+end
+
+logger1 = Logger.new('logs/logfile.log', 10, 1024000)
+logger2 = Logger.new('logs/tweets', 10, 102400)
 
 TweetStream.configure do |config|
   config.consumer_key       = Conf::CONSUMER_KEY
@@ -18,27 +27,24 @@ TweetStream.configure do |config|
   config.auth_method        = :oauth
 end
 
-def dputs(val)
-    if DEBUG
-        puts val
-    end
-end
+puts "Connection to database and getting reading user id list"
+db = set_up_db("127.0.0.1")
+ids = get_user_ids()
+tracker = Hash[ids.collect {|id| [id, 0]}]
 
-# a couple of ids
-ladygaga_id = 14230524
-barackObama_id = 813286
-dpzmick_id = 14080233
-notzmick_id = 1155825132
-cnn_breaking_news_id = 428333
+puts "Starting streaming API"
 
-id = cnn_breaking_news_id
-storage = db.collection(id.to_s)
-
-TweetStream::Client.new.follow(id) do |status|
-    dputs "#{status.text}"
+TweetStream::Client.new.follow(ids) do |status, cl|
     begin
-        storage.insert(status.to_hash)
+        owner = tweet_owner(status, ids)
+        get_collection(db, owner).insert(repr_tweet(status))
+        tracker[owner] += 1
+        print_tracker(tracker)
+        logger2.info "\n\t#{status.text} \n\towner: #{owner}"
     rescue Exception => error
+        logger1.error error
         puts error
+    rescue SignalException => e
+        break
     end
 end
