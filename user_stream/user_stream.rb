@@ -34,17 +34,18 @@ tracker = Hash[ids.collect {|id| [id, 0]}]
 
 puts "Starting streaming API"
 
-TweetStream::Client.new.follow(ids) do |status, cl|
+TweetStream::Client.new.follow(ids) do |status|
     begin
-        owner = tweet_owner(status, ids)
-        get_collection(db, owner).insert(repr_tweet(status))
-        tracker[owner] += 1
+        owners = tweet_owners(status, ids)
+        repr = repr_tweet(status)
+        owners.each do |owner| 
+            get_collection(db, owner).insert(repr)
+            tracker[owner] += 1
+            logger2.info "\n\t#{status.text} \n\towner: #{owner}"
+        end
         print_tracker(tracker)
-        logger2.info "\n\t#{status.text} \n\towner: #{owner}"
     rescue Exception => error
-        logger1.error error
+        logger1.error "\n\t#{error}\n\t#{status.attrs}"
         puts error
-    rescue SignalException => e
-        break
     end
 end

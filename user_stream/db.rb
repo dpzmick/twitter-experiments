@@ -7,6 +7,8 @@ require './config'
 include Mongo
 
 # "MODEL"
+# Takes a Twitter::Tweet object an returns a hash consiting of the attributes I
+# care about
 def repr_tweet(tweet)
     data = {
         :id          => tweet.id,
@@ -24,16 +26,14 @@ def repr_tweet(tweet)
     }
     data[:coordinates]       = {
         :coordinates         => tweet.geo.coordinates
-
     } if not tweet.geo.nil?
     data[:place]             = {
         :id                  => tweet.place.id,
-        :country_code        => tweet.place.country_code,
-        :bounding_box        => {
-            :coordinates => tweet.place.bounding_box.coordinates,
-        }
+        :country_code        => tweet.place.country_code
     } if not tweet.place.nil?
-
+    data[:place][:bounding_box] = {
+        :coordinates         => tweet.place.bounding_box.coordinates
+    } if not tweet.place.nil? and tweet.place.bounding_box.nil?
     data[:retweeted_status]  = {
             :id              => tweet.retweeted_status.id,
             :created_at      => tweet.retweeted_status.created_at,
@@ -41,32 +41,34 @@ def repr_tweet(tweet)
             :user            => {
                 :id          => tweet.retweeted_status.user.id
             }
-        } if not tweet.retweeted_status.nil?
+    } if not tweet.retweeted_status.nil?
+    data[:mentions] = tweet.user_mentions.map do |el|
+        {
+            :screen_name => el.screen_name,
+            :id          => el.id
+        }
+    end if not tweet.user_mentions.nil?
+    data[:hashtags] = tweet.hashtags.map {|el| el.text} if not tweet.hashtags.nil?
     return data
 end
 
-# figure out which account the tweet is associated with
+# figure out which account a Twitter::Tweet is associated with.
 # tweets will be:
 #   1) From account in list
 #   2) A retweet of a tweet by someone in list
 #   3) A mention of someone in list
-# TODO: name better
-def tweet_owner(tweet, options)
+def tweet_owners(tweet, options)
     posterID = tweet.user.id 
     originalPosterID =
         tweet.retweeted_status.user.id if not tweet.retweeted_status.nil?
     mentionIDs = 
         tweet.user_mentions.map {|mention| mention.id} if not tweet.user_mentions.nil?
     if options.include?(posterID)
-        return posterID
+        return [posterID]
     elsif options.include?(originalPosterID)
-        return originalPosterID
+        return [originalPosterID]
     elsif not (options & mentionIDs).empty?
-        ids = options & mentionIDs
-        if ids.length != 1
-            raise "Error getting tweet's owner"
-        end
-        return ids[0]
+        return options & mentionIDs
     else
         raise "Error getting tweet's owner"
     end
@@ -83,7 +85,7 @@ end
 
 # IO
 
-# Returns an array of the ids in a file formatted:
+# Returns an array of the ids extracted from a file formatted:
 # screenname: id
 # screename: id
 def get_user_ids(fname="../id_list")

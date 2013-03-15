@@ -8,7 +8,8 @@ Visualization:
 Technical Issues:
     - Faster way to find retweets
         - Continue tuning queries
-    - Find better way to store tweets in mongo and cleanup old storage
+    - Find better way to store tweets in mongo
+    - cleanup old storage
     - Move graph to db, build continuous graph tool
         - Run a couple of queries on each user in list, update database entry.
           Cycle through accounts and users
