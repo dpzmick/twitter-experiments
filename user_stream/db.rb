@@ -33,7 +33,7 @@ def repr_tweet(tweet)
     } if not tweet.place.nil?
     data[:place][:bounding_box] = {
         :coordinates         => tweet.place.bounding_box.coordinates
-    } if not tweet.place.nil? and tweet.place.bounding_box.nil?
+    } if not tweet.place.nil? and not tweet.place.bounding_box.nil?
     data[:retweeted_status]  = {
             :id              => tweet.retweeted_status.id,
             :created_at      => tweet.retweeted_status.created_at,
