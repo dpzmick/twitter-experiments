@@ -64,7 +64,7 @@ def simpleBarChart(tweet, retweets):
 
 if __name__ == "__main__":
     userID = pickUser()
-    db = setUpDB('127.0.0.1', 'new_tweets')
+    db = setUpDB('66.228.60.19', 'new_tweets')
     tweets = getCollection(db, userID)
 
     print Fore.BLUE + "Getting users tweets" + Fore.RESET
