@@ -1,5 +1,7 @@
 require './db'
 require 'logger'
+require 'typhoeus'
+require 'typhoeus/adapters/faraday'
 
 def pretty_sleep(label, time)
     flag = true
@@ -36,12 +38,23 @@ end
 def fetch(ids, client, n, conn)
     i = 0
     loop do
-        cursor = -1
+        cur = conn['cursors'].find_one({'_id' => ids[i]})
+        if cur.nil?
+            cursor = -1
+        else
+            tputs "Using fetched cursor #{cur['cursor']}"
+            cursor = cur['cursor']
+        end
         n.times do
             tputs "making a request for #{ids[i]}"
             begin
                 fs = client.follower_ids(ids[i], {:cursor => cursor})
                 cursor = fs.next_cursor
+                if cursor == 0
+                    tputs "Sleeping, then breaking (cursor was 0)"
+                    sleep(60)
+                    break
+                end
                 store(fs.ids, ids[i], conn)
                 tputs "Sleeping"
                 sleep(60)
@@ -53,6 +66,9 @@ def fetch(ids, client, n, conn)
                 break
             end
         end
+        conn['cursors'].update( {'_id' => ids[i]},
+                                {'$set' => { 'cursor' => cursor}},
+                                {:upsert => true})
         i = (i + 1) % ids.length
     end
 end
@@ -73,12 +89,32 @@ def store(ids, user_id, conn)
     end
 end
 
+# make a twitter client with credentials given
+def mk_twit_client(creds)
+    Twitter.configure do |config|
+        config.consumer_key = creds[:consumer_key]
+        config.consumer_secret = creds[:consumer_secret]
+        config.oauth_token = creds[:oauth_token]
+        config.oauth_token_secret = creds[:oauth_token_secret]
+    end
+    middleware = Proc.new do |builder|
+        builder.use Twitter::Request::MultipartWithFile
+        builder.use Faraday::Request::Multipart
+        builder.use Faraday::Request::UrlEncoded
+        builder.use Twitter::Response::RaiseError, Twitter::Error::ClientError
+        builder.use Twitter::Response::ParseJson
+        builder.use Twitter::Response::RaiseError, Twitter::Error::ServerError
+        builder.adapter :typhoeus
+    end
+    return Twitter::Client.new(:middleware => Faraday::Builder.new(&middleware))
+end
+
 addr = "127.0.0.1"
 _db = "followers"
 n = 5
 
 id_list = get_user_ids()
-clients = CONFIG.map { | account, attrs | Twitter::Client.new(attrs) }
+clients = CONFIG.map { | account, attrs | mk_twit_client(CONFIG[account]) }
 conn = Connection.new(addr).db(_db)
 LOG = Logger.new('logs/logfile.log', 10, 1024000)
 
