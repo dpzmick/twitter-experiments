@@ -1,6 +1,7 @@
 # a couple of handy functions for accessing the database
 import pymongo
 import difflib
+import re
 
 def setUpDB(addr='66.228.60.19', _db='tweets'):
     conn = pymongo.Connection(addr)
@@ -11,20 +12,26 @@ def getCollection(db, userID):
     return db[str(userID)]
 
 def getUsersTweets(tweets, userID):
-    user_tweets = []
-    for tweet in tweets.find({'user.id' : userID}):
-        user_tweets.append(tweet)
-    return user_tweets
+    q = {'user.id' : userID}
+    return [tweet for 
+            tweet in tweets.find(q).sort('created_at', 1).batch_size(100000)]
 
+# add date option to both
 def findRetweetsQuicker(tweets, i_tweet):
-    retweets = []
-    for tweet in tweets.find({'retweeted_status.text' : i_tweet['text']}):
-        retweets.append(tweet)
-    return retweets
+    q = {"$and" : 
+            [
+                { "user.id" : { "$ne" : i_tweet["user"]["id"] } }, 
+                { "retweeted_status.text" : i_tweet['text'] }
+            ]
+        }
+    return [tweet for tweet in tweets.find(q).batch_size(100000)]
 
 def findRetweetsSlower(tweets, i_tweet):
-    retweets = []
-    for tweet in tweets.find():
-        if difflib.SequenceMatcher(None, tweet['text'], i_tweet['text']).ratio() > 0.6:
-            retweets.append(tweet)
-    return retweets
+    r = re.compile(".*" + i_tweet['text'] + "*", re.IGNORECASE)
+    q = {'$and' :
+            [
+                { 'user.id' : { "$ne" : i_tweet["user"]["id"] } },
+                { 'text' : {'$regex' : r } }
+            ]
+        }
+    return [tweet for tweet in tweets.find(q).batch_size(100000)]

@@ -9,6 +9,7 @@ import math
 import dateutil.parser
 from colorama import init, Fore
 init()
+import time
 
 # IO
 def pickUser(id_list_name = '../id_list'):
@@ -34,7 +35,7 @@ def simpleBarChart(tweet, retweets):
     print Fore.BLUE + "Now making a nice picture" + Fore.RESET
     times = []
     for retweet in retweets:
-        times.append(dateutil.parser.parse(retweet['created_at']))
+        times.append(retweet['created_at'])
 
     # setup bins for bar graph.
     # range: time of first tweet -> time of last tweet
@@ -54,6 +55,7 @@ def simpleBarChart(tweet, retweets):
         elapsed_intervals = math.floor((time - first).total_seconds() / interval)
         intervals[elapsed_intervals] = intervals.get(elapsed_intervals, 0) + 1
 
+    #plt.yscale('symlog')
     plt.title(tweet['text'] + '\n' + tweet['user']['screen_name'])
     plt.ylabel('Retweets')
     plt.xlabel('%d second intervals after initial tweet' % interval)
@@ -62,7 +64,7 @@ def simpleBarChart(tweet, retweets):
 
 if __name__ == "__main__":
     userID = pickUser()
-    db = setUpDB()
+    db = setUpDB('127.0.0.1', 'new_tweets')
     tweets = getCollection(db, userID)
 
     print Fore.BLUE + "Getting users tweets" + Fore.RESET
@@ -74,3 +76,6 @@ if __name__ == "__main__":
     print Fore.BLUE + "Found %s%d%s" % (Fore.RED, len(retweets), Fore.RESET)
     
     simpleBarChart(interesting_tweet, retweets)
+
+# what percentage retweeted were direct followers?
+# funrasing organazation
