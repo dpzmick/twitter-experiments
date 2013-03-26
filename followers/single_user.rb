@@ -15,18 +15,27 @@ def tputs(str)
     puts str
     LOG.info str    
 end
-def threaded_fetch(id, client, conn, random_curr, name)
+def random_cursor()
+    cursor = ["14", "13"].sample
+    cursor += Integer(Random.rand * 10**17).to_s
+    return Integer(cursor)
+end
+def threaded_fetch(id, client, conn, use_random_curr, name)
     Thread.current['id'] = name
-    if random_curr
-        cursor = ["14", "13"].sample
-        cursor += Integer(Random.rand * 10**17).to_s
-        cursor = Integer(cursor)
+    if use_random_curr
+        cursor = random_cursor
     else
         cursor = -1
     end
-    tputs "Looping requests starting with cursor #{cursor}"
     loop do
+        while $used.include?(cursor)
+            tputs "Generating new cursor at random"
+            cursor = random_cursor
+        end
+        pre = cursor
+        $used << cursor
         cursor = fetch(id, client, conn, cursor)
+        $used.delete(pre)
     end
 end
 
@@ -103,6 +112,7 @@ id = 813286
 clients = CONFIG.map { |acc, attrs | mk_twit_client(CONFIG[acc]) }
 conn = Connection.new(addr, :pool_size => 5, :pool_timeout => 5).db(_db)
 
+$used = []
 threads = []
 threads << Thread.new { threaded_fetch(id, clients[0], conn, false, 0) }
 clients[1..clients.length].each_with_index do |client, index|
