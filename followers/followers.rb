@@ -1,25 +1,12 @@
+# Makes a twitter client for each availible account
+# Assigns a couple of ids to each client
+# Each client makes n requests for a client, and moves to next one
+# Useful to try and maintain a decent sample of followers
+
 require './db'
 require 'logger'
 require 'typhoeus'
 require 'typhoeus/adapters/faraday'
-
-def pretty_sleep(label, time)
-    flag = true
-    print label
-    $stdout.flush
-    time.times do |t|
-        if flag
-            print "#{time - t}"
-            flag = !flag
-        else
-            print "."
-            flag = !flag
-        end
-        $stdout.flush
-        sleep(1)
-    end
-    puts ""
-end
 
 # threaded puts
 def tputs(str)
@@ -28,6 +15,7 @@ def tputs(str)
     puts str
     LOG.info str
 end
+
 def threaded_fetch(ids, client, n, conn)
     Thread.current['id'] = ids.to_s
     fetch(ids, client, n, conn)
@@ -39,7 +27,7 @@ def fetch(ids, client, n, conn)
     i = 0
     loop do
         cur = conn['cursors'].find_one({'_id' => ids[i]})
-        if cur.nil?
+        if cur.nil? or cur['cursor'] == 0
             cursor = -1
         else
             tputs "Using fetched cursor #{cur['cursor']}"
@@ -62,13 +50,11 @@ def fetch(ids, client, n, conn)
                 tputs "Rate limit exceeded, sleeping for #{e.rate_limit.reset_in}"
                 sleep(e.rate_limit.reset_in) 
             end
+
             if cursor == 0
                 break
             end
         end
-        conn['cursors'].update( {'_id' => ids[i]},
-                                {'$set' => { 'cursor' => cursor}},
-                                {:upsert => true})
         i = (i + 1) % ids.length
     end
 end
@@ -115,7 +101,7 @@ n = 5
 
 id_list = get_user_ids()
 clients = CONFIG.map { | account, attrs | mk_twit_client(CONFIG[account]) }
-conn = Connection.new(addr).db(_db)
+conn = Connection.new(addr, :pool_size => 5, :pool_timeout => 5).db(_db)
 LOG = Logger.new('logs/logfile.log', 10, 1024000)
 
 slice_length = (id_list.length / clients.length.to_f).ceil

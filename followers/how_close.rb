@@ -1,3 +1,5 @@
+# Aproximates how close we are to having a complete list of followers.
+
 require 'twitter'
 require './config'
 require './db'
