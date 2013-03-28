@@ -5,3 +5,4 @@ data/*
 history/*
 *.pyc
 */logs/*
+*/logs_*/*
