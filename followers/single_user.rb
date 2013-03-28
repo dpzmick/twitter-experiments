@@ -28,14 +28,15 @@ def threaded_fetch(id, client, conn, use_random_curr, name)
         cursor = -1
     end
     loop do
-        while $used.include?(cursor)
-            tputs "Generating new cursor at random"
-            cursor = random_cursor
-        end
-        pre = cursor
-        $used << cursor
-        cursor = fetch(id, client, conn, cursor)
-        $used.delete(pre)
+        fetch(id, client, conn, random_cursor)
+        #while $used.include?(cursor) or cursor == 0
+        #    tputs "Generating new cursor at random"
+        #    cursor = random_cursor
+        #end
+        #pre = cursor
+        #$used << cursor
+        #cursor = fetch(id, client, conn, cursor)
+        #$used.delete(pre)
     end
 end
 
