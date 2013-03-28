@@ -75,7 +75,7 @@ def tweet_owners(tweet, options)
 end
 
 # CONNECTION
-def set_up_db(addr="141.142.226.111", _db="new_tweets")
+def set_up_db(addr="141.142.226.111", _db="tweets")
     Connection.new(addr).db(_db)
 end
 
