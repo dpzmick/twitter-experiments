@@ -21,7 +21,8 @@ def findRetweetsQuicker(tweets, i_tweet):
     q = {"$and" : 
             [
                 { "user.id" : { "$ne" : i_tweet["user"]["id"] } }, 
-                { "retweeted_status.text" : i_tweet['text'] }
+                { "retweeted_status.text" : i_tweet['text'] },
+                { "created_at" : { "$gte" : i_tweet['created_at'] } }
             ]
         }
     return [tweet for tweet in tweets.find(q).batch_size(100000)]
@@ -31,7 +32,8 @@ def findRetweetsSlower(tweets, i_tweet):
     q = {'$and' :
             [
                 { 'user.id' : { "$ne" : i_tweet["user"]["id"] } },
-                { 'text' : {'$regex' : r } }
+                { 'text' : {'$regex' : r } },
+                { "created_at" : { "$gte" : i_tweet['created_at'] } }
             ]
         }
     return [tweet for tweet in tweets.find(q).batch_size(100000)]
