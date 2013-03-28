@@ -75,8 +75,8 @@ def tweet_owners(tweet, options)
 end
 
 # CONNECTION
-def set_up_db(addr="66.228.60.19", _db="tweets")
-   Connection.new(addr).db(_db)
+def set_up_db(addr="141.142.226.111", _db="new_tweets")
+    Connection.new(addr).db(_db)
 end
 
 def get_collection(db, id)

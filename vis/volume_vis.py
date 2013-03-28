@@ -37,8 +37,9 @@ def numberOfRetweetsGraph(tweets, amounts, user_id):
 
 if __name__ == "__main__":
     userID = pickUser()
-    #db = setUpDB('66.228.60.19', 'new_tweets')
-    db = setUpDB('127.0.0.1', 'new_tweets')
+    #db = setUpDB('141.142.226.111', 'tweets')
+    db = setUpDB('66.228.60.19', 'new_tweets')
+    #db = setUpDB('127.0.0.1', 'new_tweets')
     tweets = getCollection(db, userID)
     findRetweets = findRetweetsQuicker
 
@@ -55,4 +56,5 @@ if __name__ == "__main__":
         amounts.append(l)
         print str(tweet['id']) + ' ' + str(l)
     
+    print "Average: " + str(sum(amounts)/len(amounts))
     numberOfRetweetsGraph(tweet_ids, amounts, userID)

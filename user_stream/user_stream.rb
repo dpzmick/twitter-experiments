@@ -28,7 +28,7 @@ TweetStream.configure do |config|
 end
 
 puts "Connection to database and getting reading user id list"
-db = set_up_db("127.0.0.1")
+db = set_up_db()
 ids = get_user_ids()
 tracker = Hash[ids.collect {|id| [id, 0]}]
 
