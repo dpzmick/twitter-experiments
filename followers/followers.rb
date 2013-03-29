@@ -95,7 +95,7 @@ def mk_twit_client(creds)
     return Twitter::Client.new(:middleware => Faraday::Builder.new(&middleware))
 end
 
-addr = "127.0.0.1"
+addr = "141.142.226.111"
 _db = "followers"
 n = 5
 

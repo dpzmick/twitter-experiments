@@ -22,7 +22,7 @@ middleware = Proc.new do |builder|
 end
 Twitter::Client.new(:middleware => Faraday::Builder.new(&middleware))
 
-db = Connection.new('127.0.0.1').db('followers')
+db = Connection.new('141.142.226.111').db('followers')
 
 ids = get_user_ids()
 needed_hash = {}
