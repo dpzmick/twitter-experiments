@@ -25,7 +25,8 @@ def findRetweetsQuicker(tweets, i_tweet):
                 { "created_at" : { "$gte" : i_tweet['created_at'] } }
             ]
         }
-    return [tweet for tweet in tweets.find(q).batch_size(100000)]
+    p = {'user.id' : 1, 'created_at' : 1}
+    return [tweet for tweet in tweets.find(q, p).batch_size(100000)]
 
 def findRetweetsSlower(tweets, i_tweet):
     r = re.compile(".*" + i_tweet['text'] + "*", re.IGNORECASE)
