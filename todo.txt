@@ -6,9 +6,9 @@ Statistics:
     - Followers : Average retweets ratio
     - Metrics:
         - How long a tweet stay "relevant"
+            - Should a tweet's relevevance be determined on absolute scale or
+              reltive? If tweet hardly gets retweeted, it won't classify as
+              relevant ever.
         - Fall off rate
         - # of retweets
         - Percentage of retweets from direct followers
-
-Technical Issues:
-    - Faster way to find retweets

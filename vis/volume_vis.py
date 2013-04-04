@@ -60,28 +60,43 @@ if __name__ == "__main__":
     data(["Found"], [len(u_tweets)])
 
     alert("Finding retweets for each user tweet")
-    tweet_ids = []
-
-    follower_amounts = []
-    not_follower_amounts = []
-
     count = 1
     total = len(u_tweets)
 
+    all_tweets = {}
+    amounts = []
     for tweet in u_tweets:
-        data(['id:', '%'], [tweet['id'], count/float(total) * 100])
+        data(['id:', '%:'], [tweet['id'], count/float(total) * 100])
 
         retweets = findRetweets(tweets, tweet)
         l = len(retweets)
         if not l == 0:
-            tweet_ids.append(tweet['id'])
+            print l
+            print tweet_relevance(tweet, retweets)
+            amounts.append(l)
+            all_tweets[tweet['id']] = retweets
+        count += 1
+         
+    average = sum(amounts)/len(amounts)
+    print "Average: " + str(average)
+
+    alert("Pruning uninteresting tweets")
+    tweet_ids = []
+    follower_amounts = []
+    not_follower_amounts = []
+    count = 0
+    for tweet_id, retweets in all_tweets.iteritems():
+        l = len(retweets)
+        if l >= average:
+            tweet_ids.append(tweet_id)
             f_count = how_many_direct_retweets(retweets, userID, followers)
             nf_count = l - f_count
             follower_amounts.append(f_count)
             not_follower_amounts.append(nf_count)
-            data(['  l:', 'f:', 'nf:'], [l, f_count, nf_count])
-
+            percentage = count/float(total) * 100
+            data(['id:','l:', 'f:', 'nf:', '%:'],
+                    [tweet_id, l, f_count, nf_count, percentage])
         count += 1
-    amounts = follower_amounts + not_follower_amounts
-    print "Average: " + str(sum(amounts)/len(amounts))
+
+
     numberOfRetweetsGraph(tweet_ids, follower_amounts, not_follower_amounts, userID)

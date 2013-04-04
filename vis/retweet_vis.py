@@ -79,6 +79,7 @@ def simpleBarChart(tweet, f_retweets, nf_retweets):
     plt.show()
 
 if __name__ == "__main__":
+    use_relevance = False
     userID = pickUser()
     db = setUpDB('141.142.226.111', 'tweets')
     tweets = getCollection(db, userID)
@@ -95,11 +96,14 @@ if __name__ == "__main__":
     retweets = findRetweets(tweets, interesting_tweet)
     print Fore.BLUE + "Found %s%d%s" % (Fore.RED, len(retweets), Fore.RESET)
 
+    relevance_interval = tweet_relevance(interesting_tweet, retweets)
+    print Fore.BLUE + "Relevance interval: " + Fore.RED + str(relevance_interval) + Fore.RESET
+    if not use_relevance:
+        print Fore.BLUE + "But not using relevance" + Fore.RESET
     print Fore.BLUE + "Spliting into followers and non-followers" + Fore.RESET
 
     # Can't say I am proud of this either
     # Split up request into a couple of smaller ones.
-    # TODO evalute if I need to be nicer to mongo
     retweets_slices = [retweets[x:x+100] for x in xrange(0, len(retweets), 100)]
     qs = [
             {'$or' :
@@ -113,10 +117,12 @@ if __name__ == "__main__":
     f_retweets = []
     nf_retweets = []
     for retweet in retweets:
-        if retweet['user']['id'] in relevant_followers:
-            f_retweets.append(retweet)
-        else:
-            nf_retweets.append(retweet)
+        et = (retweet['created_at'] - interesting_tweet['created_at']).total_seconds() 
+        if not use_relevance or et <= relevance_interval:
+            if retweet['user']['id'] in relevant_followers:
+                f_retweets.append(retweet)
+            else:
+                nf_retweets.append(retweet)
 
     # lets loop it, make multiple pictures without reloading everything
     while True:
