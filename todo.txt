@@ -1,11 +1,14 @@
 Visualization:
-    - Percentage Graph (What percent of retweets come from direct followers)
-      Divided bar chart
     - Chart showing "range" of tweet
 
 Statistics:
     - std. dev, averages, etc.
     - Followers : Average retweets ratio
+    - Metrics:
+        - How long a tweet stay "relevant"
+        - Fall off rate
+        - # of retweets
+        - Percentage of retweets from direct followers
 
 Technical Issues:
     - Faster way to find retweets

@@ -71,7 +71,8 @@ def simpleBarChart(tweet, f_retweets, nf_retweets):
     #plt.yscale('symlog')
     plt.title(tweet['text'] + '\n' + tweet['user']['screen_name'])
     plt.ylabel('Retweets')
-    plt.xlabel('%d second intervals after initial tweet' % interval)
+    plt.xlabel('%d second intervals after initial tweet (at %s)' \
+            % (interval, str(tweet['created_at'])) )
     plt.bar(f_intervals.keys(), f_intervals.values(), color='r')
     plt.bar(nf_intervals.keys(), nf_intervals.values(), color='y',
             bottom=f_intervals.values())
@@ -91,13 +92,14 @@ if __name__ == "__main__":
     print Fore.BLUE + "Using Tweet: " + Fore.WHITE + interesting_tweet['text']
 
     print Fore.BLUE + "Getting retweets (might take some time)" + Fore.RESET
-    retweets = findRetweetsQuicker(tweets, interesting_tweet)
+    retweets = findRetweets(tweets, interesting_tweet)
     print Fore.BLUE + "Found %s%d%s" % (Fore.RED, len(retweets), Fore.RESET)
 
     print Fore.BLUE + "Spliting into followers and non-followers" + Fore.RESET
 
     # Can't say I am proud of this either
     # Split up request into a couple of smaller ones.
+    # TODO evalute if I need to be nicer to mongo
     retweets_slices = [retweets[x:x+100] for x in xrange(0, len(retweets), 100)]
     qs = [
             {'$or' :
@@ -116,4 +118,6 @@ if __name__ == "__main__":
         else:
             nf_retweets.append(retweet)
 
-    simpleBarChart(interesting_tweet, f_retweets, nf_retweets)
+    # lets loop it, make multiple pictures without reloading everything
+    while True:
+        simpleBarChart(interesting_tweet, f_retweets, nf_retweets)

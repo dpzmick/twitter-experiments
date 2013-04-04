@@ -37,59 +37,51 @@ def numberOfRetweetsGraph(tweets, follower_amounts, not_follower_amounts, user_i
     ax.set_xlabel('Tweet id')
     plt.show()
 
+# display
+def alert(string):
+    print Fore.BLUE + string + Fore.RESET
+
+def data(prompts, values):
+    string = ""
+    for prompt, value in zip(prompts, values):
+        string += Fore.BLUE + prompt + ' ' + Fore.WHITE + str(value) + ' '
+    print string + Fore.RESET
+
 if __name__ == "__main__":
     userID = pickUser()
-    #db = setUpDB('66.228.60.19', 'new_tweets')
-    #db = setUpDB('127.0.0.1', 'new_tweets')
-    
     db_tweets    = setUpDB('141.142.226.111', 'tweets')
     db_followers = setUpDB('141.142.226.111', 'followers')
 
     tweets    = getCollection(db_tweets   , userID)
     followers = getCollection(db_followers, userID)
     
-    findRetweets = findRetweetsQuicker
-
-    print Fore.BLUE + "Getting users tweets" + Fore.RESET
+    alert("Getting users tweets")
     u_tweets = getUsersTweets(tweets, userID)
-    print Fore.BLUE + "Found " + Fore.RED + str(len(u_tweets)) + Fore.RESET
+    data(["Found"], [len(u_tweets)])
 
-    print Fore.BLUE + "Finding retweets" + Fore.RESET
+    alert("Finding retweets for each user tweet")
     tweet_ids = []
+
     follower_amounts = []
     not_follower_amounts = []
 
     count = 1
     total = len(u_tweets)
+
     for tweet in u_tweets:
-        print Fore.BLUE + 'id: ' + Fore.WHITE + str(tweet['id']) + ' ' + \
-                str(count/float(total) * 100) + ' %' + Fore.RESET
-        count += 1
+        data(['id:', '%'], [tweet['id'], count/float(total) * 100])
+
         retweets = findRetweets(tweets, tweet)
         l = len(retweets)
         if not l == 0:
             tweet_ids.append(tweet['id'])
-
-            print '\t' + Fore.BLUE + "Dividing retweets" + Fore.RESET
-            retweets_slices = [retweets[x:x+100] for x in xrange(0, len(retweets), 100)]
-            qs = [ 
-                    {'$or' :
-                        [ {"_id" : retweet['user']['id']} for retweet in retweets_slice]
-                    }
-                for retweets_slice in retweets_slices]
-
-            f_count = reduce(lambda ac, q: ac + followers.find(q).count(), qs, 0)
-            print '\tquery done'
+            f_count = how_many_direct_retweets(retweets, userID, followers)
             nf_count = l - f_count
-
-            print '\t' + Fore.BLUE + 'l: ' + str(l) +' f: ' + str(f_count) + \
-                    ' nf: ' + str(nf_count) + Fore.RESET
-
             follower_amounts.append(f_count)
             not_follower_amounts.append(nf_count)
+            data(['  l:', 'f:', 'nf:'], [l, f_count, nf_count])
 
-            print "\tsleeping for a bit so mongo doesn't explode"
-            time.sleep(5)
-
-    # print "Average: " + str(sum(amounts)/len(amounts))
+        count += 1
+    amounts = follower_amounts + not_follower_amounts
+    print "Average: " + str(sum(amounts)/len(amounts))
     numberOfRetweetsGraph(tweet_ids, follower_amounts, not_follower_amounts, userID)
