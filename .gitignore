@@ -6,3 +6,7 @@ history/*
 *.pyc
 */logs/*
 */logs_*/*
+
+*.csv
+*.pdf
+stats.txt
