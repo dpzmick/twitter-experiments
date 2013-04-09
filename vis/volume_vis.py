@@ -65,20 +65,30 @@ if __name__ == "__main__":
 
     all_tweets = {}
     amounts = []
+    relevances = {}
     for tweet in u_tweets:
         data(['id:', '%:'], [tweet['id'], count/float(total) * 100])
 
         retweets = findRetweets(tweets, tweet)
         l = len(retweets)
         if not l == 0:
-            print l
-            print tweet_relevance(tweet, retweets)
             amounts.append(l)
             all_tweets[tweet['id']] = retweets
+            relevances[tweet['id']] = tweet_relevance(tweet, retweets)
+            print relevances[tweet['id']]
         count += 1
          
-    average = sum(amounts)/len(amounts)
-    print "Average: " + str(average)
+    rel = sorted(relevances.values())
+    amt = sorted(amounts)
+
+    avg_amt = sum(amt)/len(amt)
+    med_amt = amt[int(math.floor(len(amt)/2))]
+    avg_rel = sum(rel)/len(rel)
+    med_rel = rel[int(math.floor(len(rel)/2))]
+    print "Average Retweets: " + str(avg_amt)
+    print "Median Retweets: " + str(med_amt)
+    print "Average Relevance: " + str(avg_rel)
+    print "Median Relevance: " + str(med_rel)
 
     alert("Pruning uninteresting tweets")
     tweet_ids = []
@@ -87,15 +97,24 @@ if __name__ == "__main__":
     count = 0
     for tweet_id, retweets in all_tweets.iteritems():
         l = len(retweets)
-        if l >= average:
+        r = relevances[tweet_id]
+        if l >= avg_amt or r >= avg_rel:
+            # TODO find more pythonic way to do this
+            flags = []
+            if l >= avg_amt:
+                flags += ['amt']
+            if r >= avg_rel:
+                flags += ['rel'] 
+
             tweet_ids.append(tweet_id)
             f_count = how_many_direct_retweets(retweets, userID, followers)
             nf_count = l - f_count
             follower_amounts.append(f_count)
             not_follower_amounts.append(nf_count)
             percentage = count/float(total) * 100
-            data(['id:','l:', 'f:', 'nf:', '%:'],
-                    [tweet_id, l, f_count, nf_count, percentage])
+            data(['id:','l:', 'f:', 'nf:', 'r'],
+                    [tweet_id, l, f_count, nf_count, r])
+            print "\t" + str(flags)
         count += 1
 
 
