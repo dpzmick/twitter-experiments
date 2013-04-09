@@ -112,8 +112,8 @@ if __name__ == "__main__":
             follower_amounts.append(f_count)
             not_follower_amounts.append(nf_count)
             percentage = count/float(total) * 100
-            data(['id:','l:', 'f:', 'nf:', 'r'],
-                    [tweet_id, l, f_count, nf_count, r])
+            data(['id:','l:', 'f:', 'nf:', 'r', '%:'],
+                    [tweet_id, l, f_count, nf_count, r, percentage])
             print "\t" + str(flags)
         count += 1
 
