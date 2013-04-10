@@ -32,7 +32,7 @@ def pickTweet(tweets, userID):
 
 # Pictures
 # I am not proud of this..
-def simpleBarChart(tweet, f_retweets, nf_retweets):
+def simpleBarChart(tweet, f_retweets, nf_retweets, interval, filename, saving):
     print Fore.BLUE + "Now making a nice picture" + Fore.RESET
     f_times = []
     for retweet in f_retweets:
@@ -47,14 +47,6 @@ def simpleBarChart(tweet, f_retweets, nf_retweets):
     # range: time of first tweet -> time of last tweet
     first = min(times)
     last = max(times)
-    print Fore.BLUE + "First: " + Fore.RED + str(first) + Fore.RESET
-    print Fore.BLUE + "Last: " + Fore.RED + str(last) + Fore.RESET
-
-    # Will look at retweets per every <interval> seconds
-    print Fore.BLUE + "Interval Size? (in seconds)" + Fore.RESET
-    interval = int(raw_input(Fore.RED + "> " + Fore.RESET))
-    print "%sUsing %s%d%s second intervals%s" % (Fore.BLUE, Fore.RED, interval,
-            Fore.BLUE, Fore.RESET)
 
     f_intervals = {}
     nf_intervals = {}
@@ -76,10 +68,50 @@ def simpleBarChart(tweet, f_retweets, nf_retweets):
     plt.bar(f_intervals.keys(), f_intervals.values(), color='r')
     plt.bar(nf_intervals.keys(), nf_intervals.values(), color='y',
             bottom=f_intervals.values())
-    plt.show()
+    if saving:
+        plt.savefig(filename)
+        plt.close()
+    else:
+        plt.show()
+
+# uhg, repeated code.
+# TODO refactor
+def non_interactive(use_relevance, interesting_tweet, retweets, userID, interval, filename):
+    print Fore.BLUE + "Noninteractive retweet graph"
+    db = setUpDB('141.142.226.111', 'tweets')
+    tweets = getCollection(db, userID)
+    
+    db_followers = setUpDB('141.142.226.111', 'followers')
+    followers = getCollection(db_followers, userID)
+
+    relevance_interval = tweet_relevance(interesting_tweet, retweets)
+
+    # Can't say I am proud of this either
+    # Split up request into a couple of smaller ones.
+    retweets_slices = [retweets[x:x+100] for x in xrange(0, len(retweets), 100)]
+    qs = [
+            {'$or' :
+                [ {"_id" : retweet['user']['id']} for retweet in retweets_slice]
+            }
+        for retweets_slice in retweets_slices]
+
+    relevant_followers = reduce(lambda ac, q: ac + \
+            [el['_id'] for el in followers.find(q)], qs, [])
+
+    f_retweets = []
+    nf_retweets = []
+    for retweet in retweets:
+        et = (retweet['created_at'] - interesting_tweet['created_at']).total_seconds() 
+        if not use_relevance or et <= relevance_interval:
+            if retweet['user']['id'] in relevant_followers:
+                f_retweets.append(retweet)
+            else:
+                nf_retweets.append(retweet)
+
+    simpleBarChart(interesting_tweet, f_retweets, nf_retweets, interval, filename, True)
 
 if __name__ == "__main__":
-    use_relevance = False
+    use_relevance = True
     userID = pickUser()
     db = setUpDB('141.142.226.111', 'tweets')
     tweets = getCollection(db, userID)
@@ -126,4 +158,10 @@ if __name__ == "__main__":
 
     # lets loop it, make multiple pictures without reloading everything
     while True:
-        simpleBarChart(interesting_tweet, f_retweets, nf_retweets)
+        # Will look at retweets per every <interval> seconds
+        print Fore.BLUE + "Interval Size? (in seconds)" + Fore.RESET
+        interval = int(raw_input(Fore.RED + "> " + Fore.RESET))
+        print "%sUsing %s%d%s second intervals%s" % (Fore.BLUE, Fore.RED, interval,
+            Fore.BLUE, Fore.RESET)
+        simpleBarChart(interesting_tweet, f_retweets, nf_retweets, interval,
+                None, False)

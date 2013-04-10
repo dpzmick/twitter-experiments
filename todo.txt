@@ -12,3 +12,4 @@ Statistics:
         - Fall off rate
         - # of retweets
         - Percentage of retweets from direct followers
+        - Number of tweets

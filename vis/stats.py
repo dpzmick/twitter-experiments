@@ -10,6 +10,7 @@ init()
 import time
 import sys
 import os
+import retweet_vis as rtvis
 
 def all_user_ids(fname="../id_list"):
     users = {}
@@ -18,6 +19,23 @@ def all_user_ids(fname="../id_list"):
         parts = line.strip().split(':')
         users[parts[0]] = int(parts[1])
     return users
+
+def write_user_csv(screen_name, u_tweets, amounts, relevances):
+    alert('Writing CSV')
+    csv_f = open(SESSION_NAME + '/' + screen_name + '.csv', 'w')
+    csv_f.write('ID, REL, DF_RT, IN_RT, TOT_RT, RT_PERCENT\n')
+    for tweet in u_tweets:
+        _id = tweet['id']
+        csv_f.write('%d, %d, %d, %d, %d, %f' %
+                (_id,
+                relevances[_id],
+                amounts[_id][0],
+                amounts[_id][1],
+                amounts[_id][0] + amounts[_id][1],
+                rt_percent_computer(amounts[_id])))
+
+        csv_f.write('\n')
+    csv_f.close()
 
 # display
 def alert(string):
@@ -29,7 +47,7 @@ def data(prompts, values):
         string += Fore.BLUE + prompt + ' ' + Fore.WHITE + str(value) + ' '
     print string + Fore.RESET
 
-def get_data(_id, u_tweets, tweets, followers):
+def get_data(_id, u_tweets, tweets, followers, screen_name):
     # relevances: {id : relevance}
     relevances = {}
     # amounts: {id : [# rt by direct followers, # of rt non direct ] }
@@ -41,6 +59,13 @@ def get_data(_id, u_tweets, tweets, followers):
         data(['id:', '%:'], [tweet['id'], count/float(total) * 100])
 
         retweets = findRetweets(tweets, tweet)
+        
+        if RETWEET_VIS and len(retweets) > 0:
+            dirname = SESSION_NAME + '/' + screen_name
+            filename = dirname + '/' + str(tweet['id']) + '.pdf' 
+            if not os.path.exists(dirname):
+                os.makedirs(SESSION_NAME + '/' + screen_name)
+            rtvis.non_interactive(True, tweet, retweets, _id, 3600, filename)
 
         l = len(retweets)
         f_count = how_many_direct_retweets(retweets, _id, followers)
@@ -67,8 +92,7 @@ def variance(lst, mean):
     return squared_diffs / len(lst)
 
 def var_graph(lst, title):
-    ind = np.arange(len(lst))
-    plt.bar(ind, lst)
+    plt.hist(lst)
     plt.title(title)
     plt.savefig(SESSION_NAME + '/' + title + '.pdf', bbox_inches=0)
     plt.close()
@@ -88,33 +112,17 @@ def stats(_id, db_tweets, db_followers, screen_name):
     u_tweets = getUsersTweets(tweets, _id)
     data(["Found", "Tweets"], [len(u_tweets), ""])
 
-    relevances, amounts = get_data(_id, u_tweets, tweets, followers)
-    alert('Writing CSV')
-    csv_f = open(SESSION_NAME + '/' + screen_name + '.csv', 'w')
-    csv_f.write('ID, REL, DF_RT, IN_RT, TOT_RT, RT_PERCENT\n')
-    for tweet in u_tweets:
-        _id = tweet['id']
-        csv_f.write('%d, %d, %d, %d, %d, %f' %
-                (_id,
-                relevances[_id],
-                amounts[_id][0],
-                amounts[_id][1],
-                amounts[_id][0] + amounts[_id][1],
-                rt_percent_computer(amounts[_id])))
-
-        csv_f.write('\n')
-    csv_f.close()
-
+    relevances, amounts = get_data(_id, u_tweets, tweets, followers, screen_name)
+    write_user_csv(screen_name, u_tweets, amounts, relevances)
 
     alert("Doing stats")
-
     amts = map(lambda el: el[0] + el[1], amounts.values())
     # what percentage of rtweets were by direct followers
     rt_percents = map(rt_percent_computer, amounts.values())
 
-    rel = sorted(relevances.values())
+    rel = [rele for rele in sorted(relevances.values()) if rele != 0]
     amt = sorted(amts)
-    per = sorted(rt_percents)
+    per = [perc for perc in sorted(rt_percents) if perc != 0]
 
     # printing
     s = ""
@@ -149,6 +157,9 @@ def stats(_id, db_tweets, db_followers, screen_name):
     return s
 
 if __name__ == "__main__":
+    # FEATURES
+    RETWEET_VIS = True
+
     if len(sys.argv) < 2:
         print "usage: python stats.py <session-name>"
         sys.exit(2)
