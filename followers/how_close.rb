@@ -41,6 +41,7 @@ end
 needed_hash.each_key do |id|
     puts id 
     puts "\t#{(have_hash[id].to_f / needed_hash[id].to_f) * 100} %"
+    puts "\tTotal: #{needed_hash[id]}"
     puts "\tRemaining : #{needed_hash[id] - have_hash[id]}"
     requests = (needed_hash[id] - have_hash[id])/5000
     puts "\tETA: #{requests} requests"

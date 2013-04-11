@@ -60,13 +60,6 @@ def get_data(_id, u_tweets, tweets, followers, screen_name):
 
         retweets = findRetweets(tweets, tweet)
         
-        if RETWEET_VIS and len(retweets) > 0:
-            dirname = SESSION_NAME + '/' + screen_name
-            filename = dirname + '/' + str(tweet['id']) + '.pdf' 
-            if not os.path.exists(dirname):
-                os.makedirs(SESSION_NAME + '/' + screen_name)
-            rtvis.non_interactive(True, tweet, retweets, _id, 3600, filename)
-
         l = len(retweets)
         f_count = how_many_direct_retweets(retweets, _id, followers)
 
@@ -77,6 +70,12 @@ def get_data(_id, u_tweets, tweets, followers, screen_name):
             relevances[tweet['id']] = tweet_relevance(tweet, retweets)
         count += 1
 
+        if RETWEET_VIS and len(retweets) > 0 and relevances[tweet['id']] > 0:
+            dirname = SESSION_NAME + '/' + screen_name
+            filename = dirname + '/' + str(tweet['id']) + '.pdf' 
+            if not os.path.exists(dirname):
+                os.makedirs(SESSION_NAME + '/' + screen_name)
+            rtvis.non_interactive(True, tweet, retweets, _id, 1800, filename)
     return (relevances, amounts)
 
 

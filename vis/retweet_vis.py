@@ -61,13 +61,16 @@ def simpleBarChart(tweet, f_retweets, nf_retweets, interval, filename, saving):
         f_intervals[elapsed_intervals] = f_intervals.get(elapsed_intervals, 0)
 
     #plt.yscale('symlog')
-    plt.title(tweet['text'] + '\n' + tweet['user']['screen_name'])
+    plt.title(tweet['text'].replace('$', "<Dollar>") + '\n' +
+            tweet['user']['screen_name'])
     plt.ylabel('Retweets')
     plt.xlabel('%d second intervals after initial tweet (at %s)' \
             % (interval, str(tweet['created_at'])) )
-    plt.bar(f_intervals.keys(), f_intervals.values(), color='r')
-    plt.bar(nf_intervals.keys(), nf_intervals.values(), color='y',
-            bottom=f_intervals.values())
+    plt.stackplot(f_intervals.keys(), f_intervals.values(),
+            nf_intervals.values(), colors=('r', 'y'))
+    #plt.bar(f_intervals.keys(), f_intervals.values(), color='r')
+    #plt.bar(nf_intervals.keys(), nf_intervals.values(), color='y',
+    #        bottom=f_intervals.values())
     if saving:
         plt.savefig(filename)
         plt.close()
