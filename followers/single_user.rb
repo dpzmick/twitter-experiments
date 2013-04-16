@@ -108,7 +108,7 @@ addr = "141.142.226.111"
 _db = "followers"
 LOG = Logger.new('logs_single/logfile.log', 10, 1024000)
 
-id = 813286
+id = 428333
 clients = CONFIG.map { |acc, attrs | mk_twit_client(CONFIG[acc]) }
 conn = Connection.new(addr, :pool_size => 5, :pool_timeout => 5).db(_db)
 

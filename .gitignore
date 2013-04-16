@@ -10,3 +10,4 @@ history/*
 *.csv
 *.pdf
 stats.txt
+.Rproj.user

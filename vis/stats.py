@@ -11,6 +11,8 @@ import time
 import sys
 import os
 import retweet_vis as rtvis
+import twitter
+import hashlib
 
 def all_user_ids(fname="../id_list"):
     users = {}
@@ -20,14 +22,20 @@ def all_user_ids(fname="../id_list"):
         users[parts[0]] = int(parts[1])
     return users
 
-def write_user_csv(screen_name, u_tweets, amounts, relevances):
+def write_tweets_csv(screen_name, u_tweets, amounts, relevances, info):
     alert('Writing CSV')
     csv_f = open(SESSION_NAME + '/' + screen_name + '.csv', 'w')
-    csv_f.write('ID, REL, DF_RT, IN_RT, TOT_RT, RT_PERCENT\n')
+    csv_f.write('ID, ID_HASH, REL, DF_RT, IN_RT, TOT_RT, RT_PERCENT\n')
     for tweet in u_tweets:
         _id = tweet['id']
-        csv_f.write('%d, %d, %d, %d, %d, %f' %
+        if CSV_INTRUIGE:
+            tot = amounts[_id][0] + amounts[_id][1]
+            per = rt_percent_computer(amounts[_id])
+            if relevances[_id] < info[1] and tot < info[0]:# and per > info[1]:
+                continue
+        csv_f.write('"%d", %s, %d, %d, %d, %d, %f' %
                 (_id,
+                hashlib.sha1(str(_id).encode("UTF-8")).hexdigest()[:6],
                 relevances[_id],
                 amounts[_id][0],
                 amounts[_id][1],
@@ -86,10 +94,6 @@ def rt_percent_computer(el):
     else:
         return float(el[0]) / l
 
-def variance(lst, mean):
-    squared_diffs = sum([(item - mean)**2 for item in lst])
-    return squared_diffs / len(lst)
-
 def var_graph(lst, title):
     plt.hist(lst)
     plt.title(title)
@@ -101,8 +105,7 @@ def var_stats(lst):
     med = lst[int(math.floor(len(lst)/2))]
     mn = min(lst)
     mx = max(lst)
-    stdev = math.sqrt(variance(lst, avg))
-    return (avg, med, mn, mx, stdev)
+    return (avg, med, mn, mx)
 
 def stats(_id, db_tweets, db_followers, screen_name):
     tweets    = getCollection(db_tweets   , _id)
@@ -111,8 +114,9 @@ def stats(_id, db_tweets, db_followers, screen_name):
     u_tweets = getUsersTweets(tweets, _id)
     data(["Found", "Tweets"], [len(u_tweets), ""])
 
+    tot_tweets = len(u_tweets)
+    followers_count = API.GetUser(_id).GetFollowersCount()
     relevances, amounts = get_data(_id, u_tweets, tweets, followers, screen_name)
-    write_user_csv(screen_name, u_tweets, amounts, relevances)
 
     alert("Doing stats")
     amts = map(lambda el: el[0] + el[1], amounts.values())
@@ -124,40 +128,42 @@ def stats(_id, db_tweets, db_followers, screen_name):
     per = [perc for perc in sorted(rt_percents) if perc != 0]
 
     # printing
-    s = ""
-    avg_amt, med_amt, min_amt, max_amt, amt_stdev = var_stats(amt)
-    s += "Average Retweets: " + str(avg_amt) + "\n"
-    s += "Median Retweets: " + str(med_amt) + "\n"
-    s += "Min Retweets: " + str(min_amt) + "\n"
-    s += "Max Rewtweets: " + str(max_amt) + "\n"
-    s += "Retweet # stdev: " + str(amt_stdev) + "\n"
-    var_graph(amt, screen_name + " Retweet Amounts")
+    avg_amt, med_amt, min_amt, max_amt = var_stats(amt)
+    print "Average Retweets: " + str(avg_amt)
+    print "Median Retweets: " + str(med_amt)
+    print "Min Retweets: " + str(min_amt)
+    print "Max Rewtweets: " + str(max_amt)
+    print
 
-    s += "\n"
+    avg_rel, med_rel, min_rel, max_rel = var_stats(rel)
+    print "Average Relevance: " + str(avg_rel)
+    print "Median Relevance: " + str(med_rel)
+    print "Min Relevance: " + str(min_rel)
+    print "Max Relevance: " + str(max_rel)
+    print
 
-    avg_rel, med_rel, min_rel, max_rel, rel_stdev = var_stats(rel)
-    s += "Average Relevance: " + str(avg_rel) + "\n"
-    s += "Median Relevance: " + str(med_rel) + "\n"
-    s += "Min Relevance: " + str(min_rel) + "\n"
-    s += "Max Relevance: " + str(max_rel) + "\n"
-    s += "Relevance stdev: " + str(rel_stdev) + "\n"
-    var_graph(rel, screen_name + " Relevance")
+    avg_per, med_per, min_per, max_per = var_stats(per)
+    print "Average Follower RT percent: " + str(avg_per)
+    print "Median Follower RT percent: " + str(med_per)
+    print "Min Follower RT percent: " + str(min_per)
+    print "Max Follower RT percent: " + str(max_per)
 
-    s += "\n"
-
-    avg_per, med_per, min_per, max_per, per_stdev = var_stats(per)
-    s += "Average Follower RT percent: " + str(avg_per) + "\n"
-    s += "Median Follower RT percent: " + str(med_per) + "\n"
-    s += "Min Follower RT percent: " + str(min_per) + "\n"
-    s += "Max Follower RT percent: " + str(max_per) + "\n"
-    s += "Follower RT percent stdev: " + str(per_stdev) + "\n"
-    var_graph(per, screen_name + " RT Percent")
-
+    if VAR_GRAPH:
+        var_graph(amt, screen_name + " Retweet Amounts")
+        var_graph(rel, screen_name + " Relevance")
+        var_graph(per, screen_name + " RT Percent")
+    
+    csv_info = (med_amt, med_rel, med_per)
+    write_tweets_csv(screen_name, u_tweets, amounts, relevances, csv_info)
+    s = "%s,%d,%d,%d,%f,%d\n" % (screen_name, followers_count, avg_amt, avg_rel,
+            avg_per, tot_tweets)
     return s
 
 if __name__ == "__main__":
     # FEATURES
-    RETWEET_VIS = True
+    VAR_GRAPH = False
+    RETWEET_VIS = False
+    CSV_INTRUIGE = True
 
     if len(sys.argv) < 2:
         print "usage: python stats.py <session-name>"
@@ -171,21 +177,23 @@ if __name__ == "__main__":
 
     os.makedirs(SESSION_NAME)
 
+    API = twitter.Api(consumer_key='8xZFzgdHPQDhceJWLXmH3g',
+                      consumer_secret='NvEG1Kh54R8VE0bsIV6sw2u35iFcuYXaciUdxlbzQc',
+                      access_token_key='14080233-7fxHD0cRyrAP9ZsglSoj1Saq9xPh6xI1pq984viOm',
+                      access_token_secret='hlc1k5rtvrVtUBCnB9tHBp4whSGOpfagY9XE7X6FxA')
+
     db_tweets    = setUpDB('141.142.226.111', 'tweets')
     db_followers = setUpDB('141.142.226.111', 'followers')
 
     users = all_user_ids()
 
-    stats_f = open(SESSION_NAME + '/stats.txt', 'w')
+    stats_f = open(SESSION_NAME + '/stats.csv', 'w')
+    stats_f.write('name,followers,amt,rel,direct_percent,total_tweets\n')
     for name in users:
         _id = users[name]
         data(["User:"], [name])
         s = stats(_id, db_tweets, db_followers, name)
-        print s
-        stats_f.write(name + "\n")
-        stats_f.write("-----------------------------------------\n")
         stats_f.write(s)
-        stats_f.write("\n")
         stats_f.flush()
 
     stats_f.close()

@@ -68,9 +68,6 @@ def simpleBarChart(tweet, f_retweets, nf_retweets, interval, filename, saving):
             % (interval, str(tweet['created_at'])) )
     plt.stackplot(f_intervals.keys(), f_intervals.values(),
             nf_intervals.values(), colors=('r', 'y'))
-    #plt.bar(f_intervals.keys(), f_intervals.values(), color='r')
-    #plt.bar(nf_intervals.keys(), nf_intervals.values(), color='y',
-    #        bottom=f_intervals.values())
     if saving:
         plt.savefig(filename)
         plt.close()
