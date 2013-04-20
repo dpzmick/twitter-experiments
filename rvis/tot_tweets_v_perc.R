@@ -1,5 +1,6 @@
 # x-axis # of tweets by user, y-axis penetration
-users <- read.csv("stats.csv", header=TRUE, sep=",")
+f <- "~/programming/ncsa/final_work/final/stats.csv"
+users <- read.csv(f, header=TRUE, sep=",")
 radius <- sqrt(users$amt / pi)
 out_network_rt <- 1 - users$direct_percent
 

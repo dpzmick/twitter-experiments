@@ -6,6 +6,7 @@ require 'tweetstream'
 require 'pp'
 include Mongo
 
+# print some info, user account: tweet count
 def print_tracker(tracker)
     longest = 
         (tracker.keys.max { |a, b| a.to_s.length <=> b.to_s.length }).to_s.length
@@ -16,6 +17,7 @@ def print_tracker(tracker)
     puts 
 end
 
+# set up some log files
 logger1 = Logger.new('logs/logfile.log', 10, 1024000)
 logger2 = Logger.new('logs/tweets', 10, 102400)
 

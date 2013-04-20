@@ -1,4 +1,4 @@
-# Makes a twitter client for each availible account
+# Makes a twitter client for each available account
 # Assigns a couple of ids to each client
 # Each client makes n requests for a client, and moves to next one
 # Useful to try and maintain a decent sample of followers

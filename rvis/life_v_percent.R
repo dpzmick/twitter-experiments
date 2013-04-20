@@ -1,5 +1,6 @@
 # x-axis lifespan, y-axis DF %, size # of retweets
-users <- read.csv("stats.csv", header=TRUE, sep=",")
+f <- "~/programming/ncsa/final_work/final/stats.csv"
+users <- read.csv(f, header=TRUE, sep=",")
 radius <- sqrt(users$amt / pi)
 lifespan_hours <- users$rel / 3600
 out_network_rt <- 1 - users$direct_percent

@@ -1,8 +1,8 @@
 scale <- function(x) {
   (x - min(x)) / (max(x) - min(x))
 }
-screen_name <- "foxnews"
-data <- read.csv(paste("~/programming/ncsa/vis/hash/", screen_name, ".csv", sep=""))
+screen_name <- "ladygaga"
+data <- read.csv("~/programming/ncsa/final_work/final/ladygaga/ladygaga_int.csv")
 clean <- data[data$REL != 0,]
 require("treemap")
 indirect_retweet_percent <- 1 - clean$RT_PERCENT

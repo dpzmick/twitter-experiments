@@ -7,7 +7,7 @@ require './config'
 include Mongo
 
 # "MODEL"
-# Takes a Twitter::Tweet object an returns a hash consiting of the attributes I
+# Takes a Twitter::Tweet object an returns a hash consisting of the attributes I
 # care about
 def repr_tweet(tweet)
     data = {

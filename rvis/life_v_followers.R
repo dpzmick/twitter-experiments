@@ -1,5 +1,6 @@
 # x-axis lifespan, y-axis # of followers, size # of retweets
-users <- read.csv("stats.csv", header=TRUE, sep=",")
+f <- "~/programming/ncsa/final_work/final/stats.csv"
+users <- read.csv(f, header=TRUE, sep=",")
 radius <- sqrt(users$amt / pi)
 followers_thousands <- users$followers / 1000
 lifespan_hours <- users$rel / 3600

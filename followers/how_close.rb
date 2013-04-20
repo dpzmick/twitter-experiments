@@ -1,4 +1,6 @@
-# Aproximates how close we are to having a complete list of followers.
+# Approximates how close we are to having a complete list of followers.
+# Note that this is a very bad approximation, the population on Twitter is
+# changing. It is challenging to create a good approximation.
 
 require 'twitter'
 require './config'

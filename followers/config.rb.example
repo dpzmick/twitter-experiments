@@ -1,0 +1,8 @@
+CONFIG = {
+    :user_name => {
+        :consumer_key => 'consumer_key',
+        :consumer_secret => 'consumer_secret',
+        :oauth_token => 'oath token',
+        :oauth_token_secret => 'oauth token secret',
+    }
+}

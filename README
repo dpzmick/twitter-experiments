@@ -1,1 +1,8 @@
-Some experiments with Twitter.
+Some experiments done with Twitter.
+
+Brief rundown of what is in this repository.
+
+user_stream used to collect tweets for users.
+followers stuff used to collect followers.
+
+I then I made some plots to see if something interesting could be found.

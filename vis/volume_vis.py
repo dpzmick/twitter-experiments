@@ -35,7 +35,9 @@ def numberOfRetweetsGraph(tweets, follower_amounts, not_follower_amounts, user_i
     ax.set_title('Retweets of ' + str(user_id) + '\'s tweets')
     ax.set_ylabel('Number of retweets')
     ax.set_xlabel('Tweet id')
-    plt.show()
+    plt.savefig(str(user_id) + '.pdf', bbox_inches=0)
+    plt.close()
+
 
 # display
 def alert(string):

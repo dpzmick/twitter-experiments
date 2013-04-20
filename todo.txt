@@ -1,9 +1,4 @@
-Visualization:
-    - Chart showing "range" of tweet
-
 Statistics:
-    - std. dev, averages, etc.
-    - Followers : Average retweets ratio
     - Metrics:
         - How long a tweet stay "relevant"
             - Should a tweet's relevevance be determined on absolute scale or
