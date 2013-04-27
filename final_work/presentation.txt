@@ -1,0 +1,59 @@
+[ Opening slide ]
+Introduce project:
+    - Began looking for some interesting source of data
+    - Picked Twitter
+        - Real time, seems relevant to here and now.
+
+Looked for ideas:
+    - Prediction with Twitter?
+    - Began to look at making predictions using sentiment.
+    - Looked for other interesting data inside Twitter, I became interested in
+      Geographic data.
+    - Map map of tweets about the flu [ Next slide: flu map ]
+
+Nate Silver's Book, The Signal and the Noise
+    - Realized that making predictions with Twitter will be difficult unless a
+      greater understanding of what twitter actually is was gained.
+    - Became curious about the structure of Twitter. How are accounts connected,
+      where is information stored, where does information enter and leave the
+      system?
+    - [ Next Slide: graph ]
+    - This is a rough graph showing the connections in my Twitter network. I
+      have no idea where I am here
+    - Shows what you would expect, large clusters with some connections between
+      them.
+
+Continued attempts to understand what exactly twitter is:
+    - Started collecting Tweets from a couple of accounts and doing some
+      analysis of them.
+
+[ Next Slide: Parabola Plot ]
+    - Make note about awareness of small number of data points.
+    - y-axis: average percentage of retweets by people not directly following
+      account (intended to represent how far a tweets information gets)
+    - x-axis: number of followers
+    - bubble size: average number of retweets for a tweet by account.
+    - possible confounding variable: more followers -> less likely to get
+      retweeted by someone that is not a follower. Very well could be
+      explanation of trend.
+    - Apparently, more retweets does not mean a tweet gets farther into the
+      network.
+        - Is it more important to get far away from your direct followers or get
+          retweeted a bunch?
+
+[ Next slide: lifespan plot ]
+    - y-axis: again, percentage out of network
+    - x-axis: lifespan. How long a tweet stays relevant.
+        - If a tweet does not get retweeted 10 times in an hour, it is said to
+          no longer be relevant. That seems extreme, but it tended to get about
+          the same thing I got inspecting the data myself, in most cases.
+    - Question, is it better to stay around for a long time or get far away from
+      your direct followers?
+
+[ Next slide: Most tweet behavior ]
+    - Most tweets tend to get retweeted mostly immediately after the initial
+      tweet, then drop of quickly
+
+[ Next slide: Some cool examples ]
+    - However, some tweets have different kinds of behavior.
+    - Question, how would we create this behavior?

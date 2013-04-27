@@ -1,0 +1,50 @@
+Finish collecting these data:
+[x] user stream collection stopped.
+[x] followers 14282672 (americancancer)
+[x] followers 813286 (BarackObama)
+[x] followers 428333 (cnnbrk)
+[x] followers 1367531 (foxnews)
+[x] followers 14230524 (ladygaga)
+
+
+Run stats (retweetvis, var graph, no int):
+[x] americancancer
+[x] BarackObama
+[x] cnnbrk
+[x] foxnews
+[x] ladygaga
+
+Run Stats (no retweet vis, no var graph, int)
+[x] americancancer
+[x] BarackObama
+[x] cnnbrk
+[x] foxnews
+[x] ladygaga
+
+Run volume_vis:
+[x] americancancer
+[x] BarackObama
+[x] cnnbrk
+[x] foxnews
+[x] ladygaga
+
+Run rectangle_vis (with int):
+[x] americancancer
+[x] BarackObama
+[x] cnnbrk
+[x] foxnews
+[x] ladygaga
+
+Run rectangle_vis (without int):
+[x] americancancer
+[x] BarackObama
+[x] cnnbrk
+[x] foxnews
+[x] ladygaga
+
+Run 4 R plots:
+[x] americancancer
+[x] BarackObama
+[x] cnnbrk
+[x] foxnews
+[x] ladygaga
