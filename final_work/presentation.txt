@@ -1,59 +1,61 @@
 [ Opening slide ]
 Introduce project:
-    - Began looking for some interesting source of data
+    - Looked for interesting data.
     - Picked Twitter
-        - Real time, seems relevant to here and now.
+        - Real time
+        - "Cool"
 
 Looked for ideas:
     - Prediction with Twitter?
-    - Began to look at making predictions using sentiment.
-    - Looked for other interesting data inside Twitter, I became interested in
-      Geographic data.
+        - Naive excitement
+            - this will be so cool
+            - so many cool things can be predicted.
+
+Begin Prediction:
+    - Prediction with sentiment.
+    - What else is there? -> Geographic data
     - Map map of tweets about the flu [ Next slide: flu map ]
 
 Nate Silver's Book, The Signal and the Noise
-    - Realized that making predictions with Twitter will be difficult unless a
-      greater understanding of what twitter actually is was gained.
-    - Became curious about the structure of Twitter. How are accounts connected,
-      where is information stored, where does information enter and leave the
-      system?
+    - Prediction Hard. Understand more about Twitter.
+        - Naive excitement eliminated
+    - Structure of Twitter.
+        - How are accounts connected
+        - where is information stored
+        - where does information enter and leave the system?
+    - Focus shifted, naive excitement again about this new course.
+
     - [ Next Slide: graph ]
-    - This is a rough graph showing the connections in my Twitter network. I
-      have no idea where I am here
-    - Shows what you would expect, large clusters with some connections between
-      them.
+    - Rough graph showing the connections in my Twitter network.
+    - Result is expected.
+    - After looking at this, realized this may be harder than expected
 
 Continued attempts to understand what exactly twitter is:
-    - Started collecting Tweets from a couple of accounts and doing some
-      analysis of them.
+    - Started collecting Tweets
 
 [ Next Slide: Parabola Plot ]
-    - Make note about awareness of small number of data points.
+    - Small number of data points.
     - y-axis: average percentage of retweets by people not directly following
-      account (intended to represent how far a tweets information gets)
+      account (intended to represent how far a tweet's information gets)
     - x-axis: number of followers
     - bubble size: average number of retweets for a tweet by account.
+    - Sweet spot.
     - possible confounding variable: more followers -> less likely to get
-      retweeted by someone that is not a follower. Very well could be
-      explanation of trend.
-    - Apparently, more retweets does not mean a tweet gets farther into the
-      network.
-        - Is it more important to get far away from your direct followers or get
-          retweeted a bunch?
+      retweeted by someone that is not a follower.
+    - More retweets !-> tweet gets farther into the network.
+    - More retweets or more depth more important?
 
 [ Next slide: lifespan plot ]
     - y-axis: again, percentage out of network
     - x-axis: lifespan. How long a tweet stays relevant.
         - If a tweet does not get retweeted 10 times in an hour, it is said to
-          no longer be relevant. That seems extreme, but it tended to get about
-          the same thing I got inspecting the data myself, in most cases.
-    - Question, is it better to stay around for a long time or get far away from
-      your direct followers?
+          no longer be relevant.
+        - Seems extreme
+        - Very close to my own determination.
+    - Again, more retweets or more depth?
 
 [ Next slide: Most tweet behavior ]
-    - Most tweets tend to get retweeted mostly immediately after the initial
-      tweet, then drop of quickly
+    - Most retweets happen immediately. Drop of quickly
 
 [ Next slide: Some cool examples ]
-    - However, some tweets have different kinds of behavior.
     - Question, how would we create this behavior?
