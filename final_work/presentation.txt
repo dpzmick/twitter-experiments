@@ -1,61 +1,62 @@
 [ Opening slide ]
 Introduce project:
-    - Looked for interesting data.
-    - Picked Twitter
-        - Real time
-        - "Cool"
-
-Looked for ideas:
-    - Prediction with Twitter?
-        - Naive excitement
-            - this will be so cool
-            - so many cool things can be predicted.
+    - Started doing experiments
+    - What here is interesting
+    - Let curiosity be my guide
 
 Begin Prediction:
-    - Prediction with sentiment.
+    - Prediction with sentiment, interesting but,
     - What else is there? -> Geographic data
-    - Map map of tweets about the flu [ Next slide: flu map ]
+    - Map map of tweets about the flu
+        - Fever, flu tracked terms
 
 Nate Silver's Book, The Signal and the Noise
     - Prediction Hard. Understand more about Twitter.
-        - Naive excitement eliminated
-    - Structure of Twitter.
+        - Others lumped everything together.
+    - Got pulled towards Structure of Twitter.
         - How are accounts connected
         - where is information stored
-        - where does information enter and leave the system?
-    - Focus shifted, naive excitement again about this new course.
 
-    - [ Next Slide: graph ]
+[ Next Slide: graph ]
     - Rough graph showing the connections in my Twitter network.
-    - Result is expected.
-    - After looking at this, realized this may be harder than expected
-
-Continued attempts to understand what exactly twitter is:
-    - Started collecting Tweets
+    - This may be harder than expected
+    - Need to simplify.
+        - Look only at retweets
+        - Look at only 5 accounts
+        - Metrics
+            - Lifespan
+                - How long a tweet remains important
+                - Determined: less than 10 retweets per hour -> dead
+            - Indirect Retweets
+                - To see how far information gets
+            - Average number of retweets for every tweet
+            - Number of followers
 
 [ Next Slide: Parabola Plot ]
-    - Small number of data points.
-    - y-axis: average percentage of retweets by people not directly following
-      account (intended to represent how far a tweet's information gets)
+    - y-axis: indirect retweets
     - x-axis: number of followers
     - bubble size: average number of retweets for a tweet by account.
     - Sweet spot.
+    - More retweets !-> tweet gets farther into the network.
     - possible confounding variable: more followers -> less likely to get
       retweeted by someone that is not a follower.
-    - More retweets !-> tweet gets farther into the network.
     - More retweets or more depth more important?
+    - Pick one:
+        - Depth
+        - Retweets
 
 [ Next slide: lifespan plot ]
-    - y-axis: again, percentage out of network
-    - x-axis: lifespan. How long a tweet stays relevant.
-        - If a tweet does not get retweeted 10 times in an hour, it is said to
-          no longer be relevant.
-        - Seems extreme
-        - Very close to my own determination.
+    - y-axis: indirect retweets
+    - x-axis: lifespan.
     - Again, more retweets or more depth?
+    - Longer life -> less depth
+    - Pick two:
+        - Lifespan
+        - retweets
+        - Depth
 
-[ Next slide: Most tweet behavior ]
-    - Most retweets happen immediately. Drop of quickly
-
-[ Next slide: Some cool examples ]
-    - Question, how would we create this behavior?
+Conclusion
+    - Twitter is interesting
+    - Process interesting.
+        - How ideas connect
+        - naive excitement -> despair -> new idea -> naive excitement
