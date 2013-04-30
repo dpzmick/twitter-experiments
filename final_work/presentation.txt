@@ -1,38 +1,48 @@
 [ Opening slide ]
 Introduce project:
-    - Started doing experiments
-    - What here is interesting
-    - Let curiosity be my guide
-
-Begin Prediction:
-    - Prediction with sentiment, interesting but,
-    - What else is there? -> Geographic data
-    - Map map of tweets about the flu
-        - Fever, flu tracked terms
-
-Nate Silver's Book, The Signal and the Noise
+    - Curiosity guided experiments with Twitter
+    - First experiment, prediction using sentiment and geographic data
     - Prediction Hard. Understand more about Twitter.
         - Others lumped everything together.
     - Got pulled towards Structure of Twitter.
         - How are accounts connected
         - where is information stored
 
+- Let me jut try something, see what happens
 [ Next Slide: graph ]
     - Rough graph showing the connections in my Twitter network.
-    - This may be harder than expected
     - Need to simplify.
         - Look only at retweets
         - Look at only 5 accounts
-        - Metrics
-            - Lifespan
-                - How long a tweet remains important
-                - Determined: less than 10 retweets per hour -> dead
-            - Indirect Retweets
-                - To see how far information gets
-            - Average number of retweets for every tweet
-            - Number of followers
+        - Look at layers
+            - Many Accounts, Single Account, Tweet
+    - Metrics
+        - Lifespan
+            - How long a tweet remains important
+            - Determined: less than 10 retweets per hour -> dead
+        - Indirect Retweets
+            - To see how far information gets
+        - Average number of retweets for every tweet
+        - Number of followers
+
+[ Next Slide: Rects ]
+    - Look at single account
+    - Each rect: tweet
+    - Size: Lifespan multiplied by number of retweets
+    - Darker color -> greater % of retweets indirect
+    - Very easy to pick out tweets that may be interesting
+
+[ Next Slide: Korea Tweet ]
+    - Individual Tweet
+    - Retweets over time
+    - Yellow: retweets indriect
+    - Red: Retweets Direct
+    - Most tweets mostly red, drop off very quickly
+    - This one is different, interesting
+        - Nature of twitter
 
 [ Next Slide: Parabola Plot ]
+    - Many Accounts
     - y-axis: indirect retweets
     - x-axis: number of followers
     - bubble size: average number of retweets for a tweet by account.
@@ -41,22 +51,10 @@ Nate Silver's Book, The Signal and the Noise
     - possible confounding variable: more followers -> less likely to get
       retweeted by someone that is not a follower.
     - More retweets or more depth more important?
-    - Pick one:
-        - Depth
-        - Retweets
-
-[ Next slide: lifespan plot ]
-    - y-axis: indirect retweets
-    - x-axis: lifespan.
-    - Again, more retweets or more depth?
-    - Longer life -> less depth
-    - Pick two:
-        - Lifespan
-        - retweets
-        - Depth
 
 Conclusion
-    - Twitter is interesting
-    - Process interesting.
-        - How ideas connect
-        - naive excitement -> despair -> new idea -> naive excitement
+    - Could work back up, use to make predictions
+    - Other Applications
+        - Marketing
+        - Predicting trends.
+    - Thanks!
