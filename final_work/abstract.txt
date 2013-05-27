@@ -1,0 +1,71 @@
+Using Twitter and other social media to make predictions and business
+decisions could be valuable, but transforming a complex social network
+into usable data is not an easy task.
+
+To transform this data into something useful, we first must find a way to
+extract some signal from all the noise present in the social network.
+
+The exact definition of signal is project dependent, but I believe that it may
+be possible, regardless of the project, to find signal by uncovering how
+different people are connected and how information moves through these
+connections.
+
+With an understanding of a social network's structure, analysts can focus
+specifically on areas of the network through which important information moves
+and ignore the rest.
+
+---
+
+Effective visualization of Twitter can help generate insight into this
+structure.
+
+To create an effective visualizations, it is useful to break Twitter
+down into "layers" and create a visualization of each layer.
+
+The first layer of interest is the information layer.
+
+This layer is the most basic layer of the system.
+
+Here we need a visualization that allows us to see how a single piece of
+information moves and behaves in the network.
+
+In the context of Twitter, the unit of information is a Tweet, and the
+information moves when a Tweet is Retweeted.
+
+Looking at this layer, insight into the general idea of the behavior of pieces
+of information moving through the system can be determined.
+
+This can help in prediction because outliers can be found.
+
+If a piece of information doesn't seem to be following the trend that has been
+established for other similar pieces of information, it is probably important.
+
+An effective visualization at this layer must also convey something about the
+nature of the network (Is interest short lived, do people outside of original
+poster's network generally see Tweets, etc.)
+
+The next interesting layer is a collection of pieces of information.
+
+We need a way to compare many pieces of information that are logically grouped
+somehow.
+
+In Twitter, this is an account.
+
+An account makes many Tweets, so we need a way to look at some subset of the
+Tweets posted by an account.
+
+This visualization will help generate insight into what Tweets posted by someone
+are actually signal, and what Tweets ultimately become unimportant.
+
+An effective visualization at this layer also must expose something about the
+nature of the accounts (Do they post many meaningless tweets and a few important
+ones?)
+
+The final layer is the network as a whole, or some subset of it.
+
+In Twitter, this means finding a compact way to visualize many accounts
+simultaneously.
+
+Using these visualizations it should be possible to explore the Twitter network
+and gain some insight into the structure of social networks, so that predictions
+can be made looking at more signal than noise.
